@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAHETI GenAI Survey Results - Complete Analysis Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --saheti-navy: #1a365d;
+            --saheti-blue: #2b4c77;
+            --saheti-light-blue: #4a6fa5;
+            --saheti-gold: #b5a36a;
+            --saheti-light-gold: #d4c090;
+            --saheti-cream: #f7f5f0;
+            --saheti-charcoal: #2d3748;
+            --saheti-light-gray: #edf2f7;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--saheti-cream) 0%, var(--saheti-light-gray) 100%);
+        }
+
+        .section { 
+            display: none; 
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .section.active { 
+            display: block; 
+        }
+        
+        .nav-button.active { 
+            background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+            transform: translateX(8px);
+        }
+
+        .nav-button {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid transparent;
+        }
+
+        .nav-button:hover {
+            background: linear-gradient(135deg, rgba(26, 54, 93, 0.1), rgba(43, 76, 119, 0.1));
+            border-left-color: var(--saheti-gold);
+            transform: translateX(4px);
+        }
+
+        .saheti-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(181, 163, 106, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .saheti-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(26, 54, 93, 0.1), 0 10px 10px -5px rgba(26, 54, 93, 0.04);
+            border-color: var(--saheti-gold);
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: transform 0.6s;
+            opacity: 0;
+        }
+
+        .stat-card:hover::before {
+            transform: rotate(45deg) translate(50%, 50%);
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(26, 54, 93, 0.2);
+        }
+
+        .saheti-navy-bg { background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-blue)); }
+        .saheti-blue-bg { background: linear-gradient(135deg, var(--saheti-blue), var(--saheti-light-blue)); }
+        .saheti-gold-bg { background: linear-gradient(135deg, var(--saheti-gold), var(--saheti-light-gold)); }
+        .saheti-accent-bg { background: linear-gradient(135deg, var(--saheti-light-blue), var(--saheti-gold)); }
+
+        .saheti-navy-text { color: var(--saheti-navy); }
+        .saheti-gold-text { color: var(--saheti-gold); }
+
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        .details-btn {
+            background: linear-gradient(135deg, var(--saheti-gold), var(--saheti-light-gold));
+            color: var(--saheti-navy);
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(181, 163, 106, 0.3);
+        }
+
+        .details-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(181, 163, 106, 0.4);
+            background: linear-gradient(135deg, var(--saheti-light-gold), #e6d7a8);
+        }
+
+        .icon-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-blue));
+            color: white;
+            margin-right: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover .icon-container {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: linear-gradient(90deg, var(--saheti-navy), var(--saheti-gold));
+            border-radius: 3px;
+            transition: width 0.8s ease-out;
+        }
+
+        .metric-highlight {
+            background: linear-gradient(135deg, rgba(181, 163, 106, 0.1), rgba(181, 163, 106, 0.05));
+            border: 1px solid rgba(181, 163, 106, 0.3);
+        }
+
+        .metric-highlight:hover {
+            background: linear-gradient(135deg, rgba(181, 163, 106, 0.2), rgba(181, 163, 106, 0.1));
+            border-color: var(--saheti-gold);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 0 5px rgba(181, 163, 106, 0.5);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(181, 163, 106, 0.8);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-animation {
+            animation: slideInFromTop 0.8s ease-out;
+        }
+
+        .stagger-animation {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .stagger-animation:nth-child(1) { animation-delay: 0.1s; opacity: 0; animation-fill-mode: forwards; }
+        .stagger-animation:nth-child(2) { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; }
+        .stagger-animation:nth-child(3) { animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards; }
+        .stagger-animation:nth-child(4) { animation-delay: 0.4s; opacity: 0; animation-fill-mode: forwards; }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-stats {
+            background: linear-gradient(135deg, rgba(26, 54, 93, 0.05), rgba(181, 163, 106, 0.05));
+            border: 1px solid rgba(181, 163, 106, 0.2);
+        }
+
+        .saheti-gradient-text {
+            background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .priority-immediate { border-left-color: #dc2626; }
+        .priority-short { border-left-color: #d97706; }
+        .priority-medium { border-left-color: var(--saheti-blue); }
+        .priority-long { border-left-color: #059669; }
+
+        .outcome-efficiency { background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(5, 150, 105, 0.05)); }
+        .outcome-development { background: linear-gradient(135deg, rgba(43, 76, 119, 0.1), rgba(43, 76, 119, 0.05)); }
+        .outcome-mitigation { background: linear-gradient(135deg, rgba(181, 163, 106, 0.1), rgba(181, 163, 106, 0.05)); }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="saheti-card shadow-lg border-b border-saheti-gold header-animation">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-bold saheti-gradient-text">SAHETI GenAI Survey Results</h1>
+                    <p class="text-gray-600 mt-2 text-lg">Complete Analysis Dashboard - May-July 2025</p>
+                </div>
+                <a href="details.html" class="details-btn px-6 py-3 rounded-lg flex items-center space-x-2 slide-in-right">
+                    <i data-lucide="external-link" class="w-5 h-5"></i>
+                    <span>View Detailed Data</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar Navigation -->
+            <div class="lg:w-72 flex-shrink-0">
+                <div class="saheti-card rounded-xl shadow-lg p-6">
+                    <h3 class="font-bold text-xl saheti-navy-text mb-6 flex items-center">
+                        <i data-lucide="layers" class="w-6 h-6 mr-3 saheti-gold-text"></i>
+                        Survey Sections
+                    </h3>
+                    <nav class="space-y-3" id="navigation">
+                        <button onclick="showSection('overview')" class="nav-button active w-full flex items-center px-4 py-3 rounded-lg text-left">
+                            <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
+                            <span class="text-sm font-medium">Executive Summary</span>
+                        </button>
+                        <button onclick="showSection('general')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
+                            <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+                            <span class="text-sm font-medium">General Usage & Attitudes</span>
+                        </button>
+                        <button onclick="showSection('teaching')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
+                            <i data-lucide="book-open" class="w-5 h-5 mr-3"></i>
+                            <span class="text-sm font-medium">GenAI in Teaching</span>
+                        </button>
+                        <button onclick="showSection('learners')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
+                            <i data-lucide="trending-up" class="w-5 h-5 mr-3"></i>
+                            <span class="text-sm font-medium">GenAI for Learners</span>
+                        </button>
+                        <button onclick="showSection('admin')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
+                            <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
+                            <span class="text-sm font-medium">GenAI in Administration</span>
+                        </button>
+                        <button onclick="showSection('demographics')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
+                            <i data-lucide="monitor" class="w-5 h-5 mr-3"></i>
+                            <span class="text-sm font-medium">Staff Demographics & IT</span>
+                        </button>
+                        <button onclick="showSection('feedback')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
+                            <i data-lucide="message-square" class="w-5 h-5 mr-3"></i>
+                            <span class="text-sm font-medium">Open Feedback</span>
+                        </button>
+                        <button onclick="showSection('recommendations')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
+                            <i data-lucide="target" class="w-5 h-5 mr-3"></i>
+                            <span class="text-sm font-medium">Recommendations</span>
+                        </button>
+                    </nav>
+
+                    <!-- Quick Stats Panel -->
+                    <div class="mt-8 quick-stats rounded-xl p-5 pulse-glow">
+                        <h4 class="font-bold text-lg saheti-navy-text mb-4 flex items-center">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 mr-2 saheti-gold-text"></i>
+                            Quick Stats
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 font-medium">Total Responses:</span>
+                                <span class="font-bold saheti-navy-text text-lg">112</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 font-medium">Response Rate:</span>
+                                <span class="font-bold saheti-gold-text text-lg">56%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 font-medium">Work Usage:</span>
+                                <span class="font-bold saheti-navy-text text-lg">77%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 font-medium">Want Training:</span>
+                                <span class="font-bold saheti-gold-text text-lg">76%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1">
+                <!-- Executive Summary Section -->
+                <div id="overview" class="section active">
+                    <div class="space-y-8">
+                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
+                            <div class="flex items-start">
+                                <div class="icon-container">
+                                    <i data-lucide="file-text" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h2 class="text-3xl font-bold saheti-navy-text mb-4">Executive Summary</h2>
+                                    <p class="text-gray-700 mb-8 text-lg leading-relaxed">
+                                        Strong participation (112 staff, ~56% response rate) reveals cautiously optimistic attitudes 
+                                        toward GenAI with widespread usage already occurring.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white stagger-animation">
+                                    <div class="text-3xl font-bold mb-2">112</div>
+                                    <div class="text-sm opacity-90">Total Responses</div>
+                                </div>
+                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white stagger-animation">
+                                    <div class="text-3xl font-bold mb-2">56%</div>
+                                    <div class="text-sm opacity-90">Response Rate</div>
+                                </div>
+                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white stagger-animation">
+                                    <div class="text-3xl font-bold mb-2">77%</div>
+                                    <div class="text-sm opacity-90">Use GenAI at Work</div>
+                                </div>
+                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white stagger-animation">
+                                    <div class="text-3xl font-bold mb-2">80%</div>
+                                    <div class="text-sm opacity-90">Use ChatGPT</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="text-xl font-bold mb-4 flex items-center text-green-800">
+                                        <i data-lucide="check-circle" class="w-6 h-6 mr-3"></i>
+                                        Key Positive Findings
+                                    </h3>
+                                    <ul class="space-y-3 text-sm text-green-700">
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Staff cautiously optimistic about GenAI benefits (efficiency & creativity)</li>
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> 86% support GenAI for curriculum planning and lesson preparation</li>
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Experience with GenAI strongly correlates with positive attitudes</li>
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> High IT proficiency indicates readiness for adoption</li>
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Strong support across administrative departments (50-70%)</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="text-xl font-bold mb-4 flex items-center text-amber-800">
+                                        <i data-lucide="alert-triangle" class="w-6 h-6 mr-3"></i>
+                                        Key Concerns to Address
+                                    </h3>
+                                    <ul class="space-y-3 text-sm text-amber-700">
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> 69% of teachers concerned about academic honesty & cheating</li>
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> 43% worried about ethical implications & accountability</li>
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> 87% fear over-reliance could harm student skill development</li>
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Need for clear policies and detection tools</li>
+                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Gap between support levels and actual usage</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- General Usage Section -->
+                <div id="general" class="section">
+                    <div class="space-y-8">
+                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
+                            <div class="flex items-start mb-6">
+                                <div class="icon-container">
+                                    <i data-lucide="users" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h2 class="text-3xl font-bold saheti-navy-text">General GenAI Usage and Attitudes</h2>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">77%</div>
+                                    <div class="text-sm opacity-90">Use GenAI for Work</div>
+                                </div>
+                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">71%</div>
+                                    <div class="text-sm opacity-90">Personal Usage</div>
+                                </div>
+                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">80%</div>
+                                    <div class="text-sm opacity-90">Use ChatGPT</div>
+                                </div>
+                                <div class="stat-card bg-gray-500 p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">6%</div>
+                                    <div class="text-sm opacity-90">No Usage Yet</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Most Popular Activities</h3>
+                                    <ul class="text-sm space-y-2">
+                                        <li class="flex justify-between"><span>• Writing/Proofreading</span><span class="font-bold saheti-gold-text">71%</span></li>
+                                        <li class="flex justify-between"><span>• Research Assistant</span><span class="font-bold saheti-gold-text">67%</span></li>
+                                        <li class="flex justify-between"><span>• Educational Content</span><span class="font-bold saheti-gold-text">44%</span></li>
+                                        <li class="flex justify-between"><span>• Image Creation</span><span class="font-bold saheti-gold-text">35%</span></li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Recognized Benefits</h3>
+                                    <ul class="text-sm space-y-2">
+                                        <li class="flex justify-between"><span>• Improved Efficiency</span><span class="font-bold saheti-gold-text">73%</span></li>
+                                        <li class="flex justify-between"><span>• Enhanced Creativity</span><span class="font-bold saheti-gold-text">64%</span></li>
+                                        <li class="flex justify-between"><span>• Task Automation</span><span class="font-bold saheti-gold-text">65%</span></li>
+                                        <li class="flex justify-between"><span>• Better Quality Output</span><span class="font-bold saheti-gold-text">55%</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teaching Section -->
+                <div id="teaching" class="section">
+                    <div class="space-y-8">
+                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
+                            <div class="flex items-start mb-6">
+                                <div class="icon-container">
+                                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h2 class="text-3xl font-bold saheti-navy-text">GenAI in Teaching <span class="text-lg font-normal text-gray-600">(92 Academic Staff)</span></h2>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">86%</div>
+                                    <div class="text-sm opacity-90">Support Curriculum Planning</div>
+                                </div>
+                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">88%</div>
+                                    <div class="text-sm opacity-90">Support Content Creation</div>
+                                </div>
+                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">56%</div>
+                                    <div class="text-sm opacity-90">Support Assessment Use</div>
+                                </div>
+                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">62%</div>
+                                    <div class="text-sm opacity-90">Use ChatGPT for Teaching</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg text-green-800 mb-4">Strong Support Areas</h3>
+                                    <ul class="text-sm text-green-700 space-y-2">
+                                        <li>• Lesson preparation & planning</li>
+                                        <li>• Teaching materials creation</li>
+                                        <li>• Administrative documentation</li>
+                                        <li>• Professional development support</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg text-amber-800 mb-4">Areas of Concern</h3>
+                                    <ul class="text-sm text-amber-700 space-y-2">
+                                        <li>• Student assessment & grading</li>
+                                        <li>• Content reliability & accuracy</li>
+                                        <li>• Professional ethics & accountability</li>
+                                        <li>• Role uncertainty & job impact</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learners Section -->
+                <div id="learners" class="section">
+                    <div class="space-y-8">
+                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
+                            <div class="flex items-start mb-6">
+                                <div class="icon-container">
+                                    <i data-lucide="trending-up" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h2 class="text-3xl font-bold saheti-navy-text">GenAI for Learners <span class="text-lg font-normal text-gray-600">(Teacher Perspectives)</span></h2>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">67%</div>
+                                    <div class="text-sm opacity-90">Support Self-Assessment</div>
+                                </div>
+                                <div class="stat-card bg-red-600 p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">87%</div>
+                                    <div class="text-sm opacity-90">Fear Over-reliance</div>
+                                </div>
+                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">69%</div>
+                                    <div class="text-sm opacity-90">Academic Honesty Concerns</div>
+                                </div>
+                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">45%</div>
+                                    <div class="text-sm opacity-90">Suspect Current Abuse</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg text-green-800 mb-4">Acceptable Student Uses</h3>
+                                    <ul class="text-sm text-green-700 space-y-2">
+                                        <li class="flex justify-between"><span>• Self-assessment & improvement</span><span class="font-bold">67%</span></li>
+                                        <li class="flex justify-between"><span>• Personalized learning support</span><span class="font-bold">62%</span></li>
+                                        <li class="flex justify-between"><span>• Study material generation</span><span class="font-bold">60%</span></li>
+                                        <li class="flex justify-between"><span>• Research assistance</span><span class="font-bold">57%</span></li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg text-red-800 mb-4">Major Misuse Concerns</h3>
+                                    <ul class="text-sm text-red-700 space-y-2">
+                                        <li class="flex justify-between"><span>• Over-reliance harming skills</span><span class="font-bold">87%</span></li>
+                                        <li class="flex justify-between"><span>• Copying without attribution</span><span class="font-bold">86%</span></li>
+                                        <li class="flex justify-between"><span>• Cheating on tests/exams</span><span class="font-bold">86%</span></li>
+                                        <li class="flex justify-between"><span>• Using AI without understanding</span><span class="font-bold">85%</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Administration Section -->
+                <div id="admin" class="section">
+                    <div class="space-y-8">
+                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
+                            <div class="flex items-start mb-6">
+                                <div class="icon-container">
+                                    <i data-lucide="settings" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h2 class="text-3xl font-bold saheti-navy-text">GenAI in Administration <span class="text-lg font-normal text-gray-600">(20 Non-Teaching Staff)</span></h2>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">70%</div>
+                                    <div class="text-sm opacity-90">Support Admin Office Use</div>
+                                </div>
+                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">65%</div>
+                                    <div class="text-sm opacity-90">Use for Text Creation</div>
+                                </div>
+                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">70%</div>
+                                    <div class="text-sm opacity-90">See Efficiency Benefits</div>
+                                </div>
+                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">40%</div>
+                                    <div class="text-sm opacity-90">Ethical Concerns</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">High Support Departments</h3>
+                                    <ul class="text-sm space-y-2">
+                                        <li class="flex justify-between"><span>• Administrative Office</span><span class="font-bold saheti-gold-text">70%</span></li>
+                                        <li class="flex justify-between"><span>• Marketing</span><span class="font-bold saheti-gold-text">65%</span></li>
+                                        <li class="flex justify-between"><span>• IT Department</span><span class="font-bold saheti-gold-text">60%</span></li>
+                                        <li class="flex justify-between"><span>• HR</span><span class="font-bold saheti-gold-text">55%</span></li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Current Usage Patterns</h3>
+                                    <ul class="text-sm space-y-2">
+                                        <li class="flex justify-between"><span>• Text creation & editing</span><span class="font-bold saheti-gold-text">65%</span></li>
+                                        <li class="flex justify-between"><span>• Research & information</span><span class="font-bold saheti-gold-text">50%</span></li>
+                                        <li class="flex justify-between"><span>• Meeting preparation</span><span class="font-bold saheti-gold-text">25%</span></li>
+                                        <li class="flex justify-between"><span>• Media creation</span><span class="font-bold saheti-gold-text">20%</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demographics Section -->
+                <div id="demographics" class="section">
+                    <div class="space-y-8">
+                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
+                            <div class="flex items-start mb-6">
+                                <div class="icon-container">
+                                    <i data-lucide="monitor" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h2 class="text-3xl font-bold saheti-navy-text">Staff Demographics & IT Proficiency</h2>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">92</div>
+                                    <div class="text-sm opacity-90">Teaching Staff</div>
+                                </div>
+                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">20</div>
+                                    <div class="text-sm opacity-90">Non-Teaching Staff</div>
+                                </div>
+                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">18</div>
+                                    <div class="text-sm opacity-90">Median Teaching Experience</div>
+                                </div>
+                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">26</div>
+                                    <div class="text-sm opacity-90">Median Work Experience</div>
+                                </div>
+                                <div class="stat-card bg-teal-600 p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">99%</div>
+                                    <div class="text-sm opacity-90">Teachers Moderate+ IT Skills</div>
+                                </div>
+                                <div class="stat-card bg-cyan-600 p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">100%</div>
+                                    <div class="text-sm opacity-90">Non-Teachers Moderate+ IT Skills</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Section -->
+                <div id="feedback" class="section">
+                    <div class="space-y-8">
+                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
+                            <div class="flex items-start mb-6">
+                                <div class="icon-container">
+                                    <i data-lucide="message-square" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h2 class="text-3xl font-bold saheti-navy-text">Open Feedback & Suggestions</h2>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">76%</div>
+                                    <div class="text-sm opacity-90">Want Training</div>
+                                </div>
+                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">61%</div>
+                                    <div class="text-sm opacity-90">Want Paid Tools</div>
+                                </div>
+                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">58%</div>
+                                    <div class="text-sm opacity-90">Need Approved List</div>
+                                </div>
+                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
+                                    <div class="text-3xl font-bold mb-2">82</div>
+                                    <div class="text-sm opacity-90">Detailed Responses</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Top Support Requests</h3>
+                                    <ul class="text-sm space-y-2">
+                                        <li>• Hands-on training workshops (76%)</li>
+                                        <li>• Premium tool subscriptions (61%)</li>
+                                        <li>• Vetted approved tools list (58%)</li>
+                                        <li>• Clear policies and guidelines</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="metric-highlight p-6 rounded-xl">
+                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Desired Use Cases</h3>
+                                    <ul class="text-sm space-y-2">
+                                        <li>• Lesson planning & preparation</li>
+                                        <li>• Teaching resources creation</li>
+                                        <li>• Student support & differentiation</li>
+                                        <li>• Administrative & communication tasks</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendations Section -->
+                <div id="recommendations" class="section">
+                    <div class="space-y-8">
+                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
+                            <div class="flex items-start mb-6">
+                                <div class="icon-container">
+                                    <i data-lucide="target" class="w-6 h-6"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h2 class="text-3xl font-bold saheti-navy-text">Recommendations & Action Plan</h2>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                                <div class="p-6 rounded-xl text-center border-2 border-red-200 bg-red-50">
+                                    <div class="text-lg font-bold text-red-600">Immediate</div>
+                                    <div class="text-sm text-gray-600">Policies & Tools</div>
+                                </div>
+                                <div class="p-6 rounded-xl text-center border-2 border-orange-200 bg-orange-50">
+                                    <div class="text-lg font-bold text-orange-600">Short-term</div>
+                                    <div class="text-sm text-gray-600">Training & Infrastructure</div>
+                                </div>
+                                <div class="p-6 rounded-xl text-center border-2 border-blue-200 bg-blue-50">
+                                    <div class="text-lg font-bold saheti-navy-text">Medium-term</div>
+                                    <div class="text-sm text-gray-600">Pilots & Education</div>
+                                </div>
+                                <div class="p-6 rounded-xl text-center border-2 border-green-200 bg-green-50">
+                                    <div class="text-lg font-bold text-green-600">Long-term</div>
+                                    <div class="text-sm text-gray-600">Monitor & Optimize</div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="border rounded-xl p-6 border-l-4 priority-immediate bg-red-50">
+                                    <h3 class="font-bold text-lg flex items-center mb-3">
+                                        <i data-lucide="shield" class="w-6 h-6 mr-3 text-red-600"></i>
+                                        1. Develop Clear GenAI Usage Policies
+                                    </h3>
+                                    <p class="text-gray-700 mb-3">Create comprehensive policies for ethical staff and student use</p>
+                                    <span class="bg-red-100 text-red-800 px-4 py-2 rounded-full text-sm font-medium">Immediate Priority</span>
+                                </div>
+                                
+                                <div class="border rounded-xl p-6 border-l-4 priority-short bg-orange-50">
+                                    <h3 class="font-bold text-lg flex items-center mb-3">
+                                        <i data-lucide="users" class="w-6 h-6 mr-3 text-orange-600"></i>
+                                        2. Provide Comprehensive Training
+                                    </h3>
+                                    <p class="text-gray-700 mb-3">Tiered training program from basic to advanced AI applications</p>
+                                    <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">Short-term Priority</span>
+                                </div>
+                                
+                                <div class="border rounded-xl p-6 border-l-4 priority-medium bg-blue-50">
+                                    <h3 class="font-bold text-lg flex items-center mb-3">
+                                        <i data-lucide="book-open" class="w-6 h-6 mr-3 saheti-navy-text"></i>
+                                        3. Launch Pilot Projects
+                                    </h3>
+                                    <p class="text-gray-700 mb-3">Structured pilots to demonstrate effective AI integration</p>
+                                    <span class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">Medium-term Priority</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 border border-blue-200 mt-8">
+                                <h3 class="text-2xl font-bold mb-6 saheti-navy-text">Expected Outcomes</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                    <div class="outcome-efficiency p-6 rounded-xl">
+                                        <h4 class="font-bold text-lg text-green-800 mb-4">Efficiency Gains:</h4>
+                                        <ul class="text-green-700 space-y-2">
+                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Reduced lesson planning time</li>
+                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Faster administrative reporting</li>
+                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Enhanced student engagement</li>
+                                        </ul>
+                                    </div>
+                                    <div class="outcome-development p-6 rounded-xl">
+                                        <h4 class="font-bold text-lg saheti-navy-text mb-4">Staff Development:</h4>
+                                        <ul class="text-blue-700 space-y-2">
+                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Increased AI comfort levels</li>
+                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Higher tool adoption rates</li>
+                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Innovation in teaching methods</li>
+                                        </ul>
+                                    </div>
+                                    <div class="outcome-mitigation p-6 rounded-xl">
+                                        <h4 class="font-bold text-lg saheti-gold-text mb-4">Risk Mitigation:</h4>
+                                        <ul class="text-amber-700 space-y-2">
+                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Maintained academic integrity</li>
+                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Clear ethical guidelines</li>
+                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Controlled student AI use</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sections = [
+            { id: 'overview', title: 'Executive Summary' },
+            { id: 'general', title: 'General Usage & Attitudes' },
+            { id: 'teaching', title: 'GenAI in Teaching' },
+            { id: 'learners', title: 'GenAI for Learners' },
+            { id: 'admin', title: 'GenAI in Administration' },
+            { id: 'demographics', title: 'Staff Demographics & IT' },
+            { id: 'feedback', title: 'Open Feedback' },
+            { id: 'recommendations', title: 'Recommendations' }
+        ];
+
+        let currentSectionIndex = 0;
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section with animation
+            const targetSection = document.getElementById(sectionId);
+            targetSection.classList.add('active');
+            
+            // Find and activate the correct nav button by matching the onclick attribute
+            const navButtons = document.querySelectorAll('.nav-button');
+            navButtons.forEach(btn => {
+                const onclickAttr = btn.getAttribute('onclick');
+                if (onclickAttr && onclickAttr.includes(`'${sectionId}'`)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update current section index
+            currentSectionIndex = sections.findIndex(s => s.id === sectionId);
+            
+            // Animate stat cards in stagger
+            setTimeout(() => {
+                const statCards = targetSection.querySelectorAll('.stat-card');
+                statCards.forEach((card, index) => {
+                    card.style.animationDelay = (index * 0.1) + 's';
+                    card.classList.add('stagger-animation');
+                });
+            }, 100);
+        }
+
+        // Add smooth scrolling and enhanced interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Add hover effects to metric cards
+            document.querySelectorAll('.metric-highlight').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                    this.style.boxShadow = '0 20px 25px -5px rgba(26, 54, 93, 0.1)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // Add progressive loading animation to stat cards
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const statCards = entry.target.querySelectorAll('.stat-card');
+                        statCards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0) scale(1)';
+                            }, index * 150);
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all sections for animations
+            document.querySelectorAll('.section').forEach(section => {
+                observer.observe(section);
+                
+                // Initialize stat cards as hidden
+                const statCards = section.querySelectorAll('.stat-card');
+                statCards.forEach(card => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(30px) scale(0.95)';
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+            });
+
+            // Parallax effect removed for better UX
+
+            // Initialize first section animations
+            setTimeout(() => {
+                const firstSection = document.querySelector('.section.active');
+                if (firstSection) {
+                    const statCards = firstSection.querySelectorAll('.stat-card');
+                    statCards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0) scale(1)';
+                        }, index * 150);
+                    });
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

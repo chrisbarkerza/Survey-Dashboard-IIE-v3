@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAHETI GenAI Survey Results - Complete Analysis Dashboard</title>
+    <title>IIE Summary Results - GenAI Survey Analysis Dashboard</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
     <style>
         :root {
             --saheti-navy: #1a365d;
@@ -19,35 +26,22 @@
             --saheti-light-gray: #edf2f7;
         }
 
-        body {
-            background: linear-gradient(135deg, var(--saheti-cream) 0%, var(--saheti-light-gray) 100%);
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
         }
-
-        .section { 
-            display: none; 
-            animation: fadeInUp 0.6s ease-out;
+        .nav-button.active {
+            border-bottom: 2px solid #3B82F6;
+            color: #2563EB;
+            background-color: #EFF6FF;
         }
-        
-        .section.active { 
-            display: block; 
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
         }
-        
-        .nav-button.active { 
-            background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-blue));
-            color: white;
-            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
-            transform: translateX(8px);
-        }
-
-        .nav-button {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 3px solid transparent;
-        }
-
-        .nav-button:hover {
-            background: linear-gradient(135deg, rgba(26, 54, 93, 0.1), rgba(43, 76, 119, 0.1));
-            border-left-color: var(--saheti-gold);
-            transform: translateX(4px);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .saheti-card {
@@ -63,53 +57,11 @@
             border-color: var(--saheti-gold);
         }
 
-        .stat-card {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            transition: transform 0.6s;
-            opacity: 0;
-        }
-
-        .stat-card:hover::before {
-            transform: rotate(45deg) translate(50%, 50%);
-            opacity: 1;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(26, 54, 93, 0.2);
-        }
-
-        .saheti-navy-bg { background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-blue)); }
-        .saheti-blue-bg { background: linear-gradient(135deg, var(--saheti-blue), var(--saheti-light-blue)); }
-        .saheti-gold-bg { background: linear-gradient(135deg, var(--saheti-gold), var(--saheti-light-gold)); }
-        .saheti-accent-bg { background: linear-gradient(135deg, var(--saheti-light-blue), var(--saheti-gold)); }
-
-        .saheti-navy-text { color: var(--saheti-navy); }
-        .saheti-gold-text { color: var(--saheti-gold); }
-
-        .floating-animation {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .pulse-glow {
-            animation: pulseGlow 2s ease-in-out infinite alternate;
-        }
-
-        .slide-in-right {
-            animation: slideInRight 0.8s ease-out;
+        .saheti-gradient-text {
+            background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .details-btn {
@@ -126,78 +78,8 @@
             background: linear-gradient(135deg, var(--saheti-light-gold), #e6d7a8);
         }
 
-        .icon-container {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-blue));
-            color: white;
-            margin-right: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .section-card:hover .icon-container {
-            transform: rotate(10deg) scale(1.1);
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: linear-gradient(90deg, var(--saheti-navy), var(--saheti-gold));
-            border-radius: 3px;
-            transition: width 0.8s ease-out;
-        }
-
-        .metric-highlight {
-            background: linear-gradient(135deg, rgba(181, 163, 106, 0.1), rgba(181, 163, 106, 0.05));
-            border: 1px solid rgba(181, 163, 106, 0.3);
-        }
-
-        .metric-highlight:hover {
-            background: linear-gradient(135deg, rgba(181, 163, 106, 0.2), rgba(181, 163, 106, 0.1));
-            border-color: var(--saheti-gold);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        @keyframes pulseGlow {
-            0% {
-                box-shadow: 0 0 5px rgba(181, 163, 106, 0.5);
-            }
-            100% {
-                box-shadow: 0 0 20px rgba(181, 163, 106, 0.8);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .header-animation {
+            animation: slideInFromTop 0.8s ease-out;
         }
 
         @keyframes slideInFromTop {
@@ -211,751 +93,1018 @@
             }
         }
 
-        .header-animation {
-            animation: slideInFromTop 0.8s ease-out;
+        .slide-in-right {
+            animation: slideInRight 0.8s ease-out;
         }
 
-        .stagger-animation {
-            animation: fadeInUp 0.6s ease-out;
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
-
-        .stagger-animation:nth-child(1) { animation-delay: 0.1s; opacity: 0; animation-fill-mode: forwards; }
-        .stagger-animation:nth-child(2) { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; }
-        .stagger-animation:nth-child(3) { animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards; }
-        .stagger-animation:nth-child(4) { animation-delay: 0.4s; opacity: 0; animation-fill-mode: forwards; }
-
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .quick-stats {
-            background: linear-gradient(135deg, rgba(26, 54, 93, 0.05), rgba(181, 163, 106, 0.05));
-            border: 1px solid rgba(181, 163, 106, 0.2);
-        }
-
-        .saheti-gradient-text {
-            background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .priority-immediate { border-left-color: #dc2626; }
-        .priority-short { border-left-color: #d97706; }
-        .priority-medium { border-left-color: var(--saheti-blue); }
-        .priority-long { border-left-color: #059669; }
-
-        .outcome-efficiency { background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(5, 150, 105, 0.05)); }
-        .outcome-development { background: linear-gradient(135deg, rgba(43, 76, 119, 0.1), rgba(43, 76, 119, 0.05)); }
-        .outcome-mitigation { background: linear-gradient(135deg, rgba(181, 163, 106, 0.1), rgba(181, 163, 106, 0.05)); }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen" style="background: linear-gradient(135deg, var(--saheti-cream) 0%, var(--saheti-light-gray) 100%);">
     <!-- Header -->
     <header class="saheti-card shadow-lg border-b border-saheti-gold header-animation">
         <div class="max-w-7xl mx-auto px-4 py-6">
             <div class="flex justify-between items-center">
                 <div>
-                    <h1 class="text-4xl font-bold saheti-gradient-text">SAHETI GenAI Survey Results</h1>
-                    <p class="text-gray-600 mt-2 text-lg">Complete Analysis Dashboard - May-July 2025</p>
+                    <h1 class="text-4xl font-bold saheti-gradient-text">
+                        IIE Summary Results
+                    </h1>
+                    <p class="text-gray-600 mt-2 text-lg">
+                        Strategic Analysis of Generative AI Adoption at The Independent Institute of Education
+                    </p>
+                    <div class="text-sm text-gray-500 mt-2 flex flex-wrap gap-4">
+                        <span>Report Date: September 1, 2025</span>
+                        <span>Responses: 331</span>
+                        <span>Participation Rate: 12.4%</span>
+                        <span>From: Imagineers.Ai</span>
+                    </div>
                 </div>
                 <a href="details.html" class="details-btn px-6 py-3 rounded-lg flex items-center space-x-2 slide-in-right">
-                    <i data-lucide="external-link" class="w-5 h-5"></i>
                     <span>View Detailed Data</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
                 </a>
             </div>
         </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Sidebar Navigation -->
-            <div class="lg:w-72 flex-shrink-0">
-                <div class="saheti-card rounded-xl shadow-lg p-6">
-                    <h3 class="font-bold text-xl saheti-navy-text mb-6 flex items-center">
-                        <i data-lucide="layers" class="w-6 h-6 mr-3 saheti-gold-text"></i>
-                        Survey Sections
-                    </h3>
-                    <nav class="space-y-3" id="navigation">
-                        <button onclick="showSection('overview')" class="nav-button active w-full flex items-center px-4 py-3 rounded-lg text-left">
-                            <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
-                            <span class="text-sm font-medium">Executive Summary</span>
-                        </button>
-                        <button onclick="showSection('general')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
-                            <i data-lucide="users" class="w-5 h-5 mr-3"></i>
-                            <span class="text-sm font-medium">General Usage & Attitudes</span>
-                        </button>
-                        <button onclick="showSection('teaching')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
-                            <i data-lucide="book-open" class="w-5 h-5 mr-3"></i>
-                            <span class="text-sm font-medium">GenAI in Teaching</span>
-                        </button>
-                        <button onclick="showSection('learners')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
-                            <i data-lucide="trending-up" class="w-5 h-5 mr-3"></i>
-                            <span class="text-sm font-medium">GenAI for Learners</span>
-                        </button>
-                        <button onclick="showSection('admin')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
-                            <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
-                            <span class="text-sm font-medium">GenAI in Administration</span>
-                        </button>
-                        <button onclick="showSection('demographics')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
-                            <i data-lucide="monitor" class="w-5 h-5 mr-3"></i>
-                            <span class="text-sm font-medium">Staff Demographics & IT</span>
-                        </button>
-                        <button onclick="showSection('feedback')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
-                            <i data-lucide="message-square" class="w-5 h-5 mr-3"></i>
-                            <span class="text-sm font-medium">Open Feedback</span>
-                        </button>
-                        <button onclick="showSection('recommendations')" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-left">
-                            <i data-lucide="target" class="w-5 h-5 mr-3"></i>
-                            <span class="text-sm font-medium">Recommendations</span>
-                        </button>
-                    </nav>
+    <!-- Navigation -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex overflow-x-auto">
+                <button class="nav-button active flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="overview">
+                    <i data-lucide="trending-up" class="mr-2 w-4 h-4"></i>
+                    Executive Overview
+                </button>
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="adoption">
+                    <i data-lucide="users" class="mr-2 w-4 h-4"></i>
+                    Overall Adoption
+                </button>
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="academic">
+                    <i data-lucide="book-open" class="mr-2 w-4 h-4"></i>
+                    Academic Staff
+                </button>
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="students">
+                    <i data-lucide="alert-triangle" class="mr-2 w-4 h-4"></i>
+                    Student Concerns
+                </button>
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="admin">
+                    <i data-lucide="briefcase" class="mr-2 w-4 h-4"></i>
+                    Administrative Staff
+                </button>
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="assistance">
+                    <i data-lucide="settings" class="mr-2 w-4 h-4"></i>
+                    Required Staff Assistance
+                </button>
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="recommendations">
+                    <i data-lucide="shield" class="mr-2 w-4 h-4"></i>
+                    Strategic Recommendations
+                </button>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Quick Stats Panel -->
-                    <div class="mt-8 quick-stats rounded-xl p-5 pulse-glow">
-                        <h4 class="font-bold text-lg saheti-navy-text mb-4 flex items-center">
-                            <i data-lucide="bar-chart-3" class="w-5 h-5 mr-2 saheti-gold-text"></i>
-                            Quick Stats
-                        </h4>
-                        <div class="space-y-3 text-sm">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 font-medium">Total Responses:</span>
-                                <span class="font-bold saheti-navy-text text-lg">112</span>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Overview Section -->
+        <div id="overview-section" class="section-content fade-in">
+            <!-- Executive Summary -->
+            <div class="saheti-card bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-lg shadow-lg mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Executive Summary</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-blue-800">Survey Overview</h3>
+                        <div class="space-y-3 text-gray-700">
+                            <p><strong>Responses:</strong> 331 (12.4% participation rate)</p>
+                            <p><strong>Key Finding:</strong> Significant self-selection bias with respondents showing exceptionally high digital literacy (64% 'High' or 'Advanced' IT proficiency) and GenAI adoption (77% for work).</p>
+                            <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                <p class="text-amber-800"><strong>Critical Note:</strong> The remaining ~88% of staff may hold different perspectives and require foundational support.</p>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 font-medium">Response Rate:</span>
-                                <span class="font-bold saheti-gold-text text-lg">56%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-red-800">Critical Crisis</h3>
+                        <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                            <p class="text-red-700 mb-3"><strong>Academic Integrity Crisis:</strong> Over 90% of academic staff are concerned about student misuse, with widespread suspected abuse.</p>
+                            <p class="text-red-700"><strong>Response Gap:</strong> Despite this awareness, only 36% have adapted their assessment designs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Statistics Dashboard -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Key Statistics</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="saheti-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="p-3 rounded-lg bg-blue-500 text-white">
+                                <i data-lucide="users" class="w-6 h-6"></i>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 font-medium">Work Usage:</span>
-                                <span class="font-bold saheti-navy-text text-lg">77%</span>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-800 mb-1">331</div>
+                        <div class="text-sm text-gray-600">Total Responses</div>
+                    </div>
+                    <div class="saheti-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="p-3 rounded-lg bg-green-500 text-white">
+                                <i data-lucide="trending-up" class="w-6 h-6"></i>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 font-medium">Want Training:</span>
-                                <span class="font-bold saheti-gold-text text-lg">76%</span>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-800 mb-1">12.4%</div>
+                        <div class="text-sm text-gray-600">Participation Rate</div>
+                    </div>
+                    <div class="saheti-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="p-3 rounded-lg bg-purple-500 text-white">
+                                <i data-lucide="book-open" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-800 mb-1">77%</div>
+                        <div class="text-sm text-gray-600">Work Usage</div>
+                    </div>
+                    <div class="saheti-card p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="p-3 rounded-lg bg-red-500 text-white">
+                                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-800 mb-1">90%+</div>
+                        <div class="text-sm text-gray-600">Academic Integrity Concerns</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Overview -->
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="saheti-card p-4 rounded-lg shadow-lg">
+                    <h4 class="text-lg font-semibold mb-3">GenAI Adoption Overview</h4>
+                    <div class="chart-container">
+                        <canvas id="adoptionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="saheti-card p-4 rounded-lg shadow-lg">
+                    <h4 class="text-lg font-semibold mb-3">Top Tools Usage</h4>
+                    <div class="chart-container">
+                        <canvas id="toolsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategic Insights -->
+            <div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Key Strategic Insights</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-green-50 p-6 rounded-lg border border-green-200">
+                        <div class="flex items-center mb-4">
+                            <i data-lucide="trending-up" class="text-green-600 mr-3 w-6 h-6"></i>
+                            <h4 class="font-bold text-green-800">The Efficiency Imperative</h4>
+                        </div>
+                        <p class="text-green-700">
+                            <strong>80% agreement</strong> on efficiency benefits drives adoption across all staff groups. 
+                            Staff are eager to reduce administrative burdens and streamline workflows.
+                        </p>
+                    </div>
+
+                    <div class="bg-red-50 p-6 rounded-lg border border-red-200">
+                        <div class="flex items-center mb-4">
+                            <i data-lucide="alert-triangle" class="text-red-600 mr-3 w-6 h-6"></i>
+                            <h4 class="font-bold text-red-800">Academic Integrity Crisis</h4>
+                        </div>
+                        <p class="text-red-700">
+                            <strong>Most urgent threat:</strong> 90%+ staff concerns about student misuse with suspected 
+                            widespread abuse, yet only 36% have adapted assessments.
+                        </p>
+                    </div>
+
+                    <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+                        <div class="flex items-center mb-4">
+                            <i data-lucide="shield" class="text-yellow-600 mr-3 w-6 h-6"></i>
+                            <h4 class="font-bold text-yellow-800">The 'Freemium' Risk</h4>
+                        </div>
+                        <p class="text-yellow-700">
+                            <strong>78.8% use free tools,</strong> exposing the institution to security vulnerabilities, 
+                            data privacy risks, and limiting access to advanced features.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other sections will be hidden initially -->
+        <div id="adoption-section" class="section-content hidden fade-in">
+            <div class="saheti-card bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-lg shadow-lg mb-8">
+                <h3 class="text-2xl font-semibold mb-4 text-gray-800">High Adoption Among Digitally Literate Staff</h3>
+                <p class="text-gray-700 mb-4">
+                    The survey reveals exceptionally high GenAI adoption rates, with 77% using it for work and 86.7% for personal use. 
+                    This reflects significant self-selection bias toward early adopters with high digital literacy.
+                </p>
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                    <p class="text-amber-700">
+                        <strong>Important:</strong> These results likely represent ~12% of staff (early adopters). 
+                        The remaining ~88% may require different approaches and foundational support.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h4 class="text-lg font-semibold mb-4">Adoption Breakdown</h4>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="font-medium text-blue-800">Work Use</span>
+                            <span class="text-2xl font-bold text-blue-600">77.0%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                            <span class="font-medium text-green-800">Personal Use</span>
+                            <span class="text-2xl font-bold text-green-600">86.7%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h4 class="text-lg font-semibold mb-4">Tool Dominance</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">ChatGPT</span>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 rounded-full h-3 mr-3">
+                                    <div class="h-3 rounded-full bg-blue-500 transition-all duration-500" style="width: 89.1%"></div>
+                                </div>
+                                <span class="font-bold text-blue-600">89.1%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Meta AI</span>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 rounded-full h-3 mr-3">
+                                    <div class="h-3 rounded-full bg-blue-500 transition-all duration-500" style="width: 49.8%"></div>
+                                </div>
+                                <span class="font-bold text-blue-600">49.8%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Microsoft Copilot</span>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 rounded-full h-3 mr-3">
+                                    <div class="h-3 rounded-full bg-blue-500 transition-all duration-500" style="width: 47.1%"></div>
+                                </div>
+                                <span class="font-bold text-blue-600">47.1%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Other Tools</span>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 rounded-full h-3 mr-3">
+                                    <div class="h-3 rounded-full bg-blue-500 transition-all duration-500" style="width: 25%"></div>
+                                </div>
+                                <span class="font-bold text-blue-600">25.0%</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Content -->
-            <div class="flex-1">
-                <!-- Executive Summary Section -->
-                <div id="overview" class="section active">
-                    <div class="space-y-8">
-                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
-                            <div class="flex items-start">
-                                <div class="icon-container">
-                                    <i data-lucide="file-text" class="w-6 h-6"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h2 class="text-3xl font-bold saheti-navy-text mb-4">Executive Summary</h2>
-                                    <p class="text-gray-700 mb-8 text-lg leading-relaxed">
-                                        Strong participation (112 staff, ~56% response rate) reveals cautiously optimistic attitudes 
-                                        toward GenAI with widespread usage already occurring.
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white stagger-animation">
-                                    <div class="text-3xl font-bold mb-2">112</div>
-                                    <div class="text-sm opacity-90">Total Responses</div>
-                                </div>
-                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white stagger-animation">
-                                    <div class="text-3xl font-bold mb-2">56%</div>
-                                    <div class="text-sm opacity-90">Response Rate</div>
-                                </div>
-                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white stagger-animation">
-                                    <div class="text-3xl font-bold mb-2">77%</div>
-                                    <div class="text-sm opacity-90">Use GenAI at Work</div>
-                                </div>
-                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white stagger-animation">
-                                    <div class="text-3xl font-bold mb-2">80%</div>
-                                    <div class="text-sm opacity-90">Use ChatGPT</div>
-                                </div>
-                            </div>
+            <div class="bg-red-50 border border-red-200 p-6 rounded-lg">
+                <h4 class="text-xl font-semibold text-red-800 mb-4 flex items-center">
+                    <i data-lucide="shield" class="mr-3 w-6 h-6"></i>
+                    Critical Security Gap
+                </h4>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-lg text-center">
+                        <div class="text-3xl font-bold text-red-600">78.8%</div>
+                        <div class="text-sm text-red-800">Use Free ChatGPT</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg text-center">
+                        <div class="text-3xl font-bold text-green-600">10.3%</div>
+                        <div class="text-sm text-green-800">Paid Subscriptions</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg text-center">
+                        <div class="text-lg font-bold text-orange-600">High Risk</div>
+                        <div class="text-sm text-orange-800">Data Privacy Exposure</div>
+                    </div>
+                </div>
+                <div class="mt-4 p-4 bg-white rounded-lg">
+                    <p class="text-red-700">
+                        <strong>Strategic Insight:</strong> Providing enterprise-grade licenses is essential for secure 
+                        and effective utilization. The institution must move from 'shadow IT' to governed deployment.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="text-xl font-bold mb-4 flex items-center text-green-800">
-                                        <i data-lucide="check-circle" class="w-6 h-6 mr-3"></i>
-                                        Key Positive Findings
-                                    </h3>
-                                    <ul class="space-y-3 text-sm text-green-700">
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Staff cautiously optimistic about GenAI benefits (efficiency & creativity)</li>
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> 86% support GenAI for curriculum planning and lesson preparation</li>
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Experience with GenAI strongly correlates with positive attitudes</li>
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> High IT proficiency indicates readiness for adoption</li>
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Strong support across administrative departments (50-70%)</li>
-                                    </ul>
+        <!-- Academic Staff Section -->
+        <div id="academic-section" class="section-content hidden fade-in">
+            <div class="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-lg border border-orange-200 mb-8">
+                <h3 class="text-2xl font-semibold mb-4 text-orange-800">Critical Implementation Gap</h3>
+                <p class="text-orange-700 mb-4">
+                    While academic staff show high support for GenAI in teaching principles, there's a significant gap 
+                    between supported principles and actual implementation, particularly in high-stakes activities.
+                </p>
+                <div class="bg-red-100 border border-red-200 p-4 rounded-lg">
+                    <p class="text-red-800">
+                        <strong>Largest Gap:</strong> Student Assessment & Feedback (36.8% gap) due to concerns over 
+                        accuracy, ethics of AI-assisted grading, and reliability.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border mb-8">
+                <h4 class="text-lg font-semibold mb-4">Implementation Gap Analysis</h4>
+                <div class="chart-container">
+                    <canvas id="gapChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h4 class="text-lg font-semibold mb-4">Confidence & Transparency Levels</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium">Feel Confident with GenAI</span>
+                                <span class="text-sm font-bold text-green-600">60.3%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div class="bg-green-500 h-4 rounded-full flex items-center justify-center text-white text-xs font-bold" style="width: 60.3%">
+                                    60.3%
                                 </div>
-                                
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="text-xl font-bold mb-4 flex items-center text-amber-800">
-                                        <i data-lucide="alert-triangle" class="w-6 h-6 mr-3"></i>
-                                        Key Concerns to Address
-                                    </h3>
-                                    <ul class="space-y-3 text-sm text-amber-700">
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> 69% of teachers concerned about academic honesty & cheating</li>
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> 43% worried about ethical implications & accountability</li>
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> 87% fear over-reliance could harm student skill development</li>
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Need for clear policies and detection tools</li>
-                                        <li class="flex items-start"><span class="font-bold mr-2">•</span> Gap between support levels and actual usage</li>
-                                    </ul>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium">Neutral/Unsure about GenAI</span>
+                                <span class="text-sm font-bold text-yellow-600">39.7%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div class="bg-yellow-500 h-4 rounded-full flex items-center justify-center text-white text-xs font-bold" style="width: 39.7%">
+                                    39.7%
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-2 border-t">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium">Always/Sometimes Inform Students</span>
+                                <span class="text-sm font-bold text-blue-600">50%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div class="bg-blue-500 h-4 rounded-full flex items-center justify-center text-white text-xs font-bold" style="width: 50%">
+                                    50%
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium">Rarely/Never Inform Students</span>
+                                <span class="text-sm font-bold text-red-600">50%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div class="bg-red-500 h-4 rounded-full flex items-center justify-center text-white text-xs font-bold" style="width: 50%">
+                                    50%
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- General Usage Section -->
-                <div id="general" class="section">
-                    <div class="space-y-8">
-                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
-                            <div class="flex items-start mb-6">
-                                <div class="icon-container">
-                                    <i data-lucide="users" class="w-6 h-6"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h2 class="text-3xl font-bold saheti-navy-text">General GenAI Usage and Attitudes</h2>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">77%</div>
-                                    <div class="text-sm opacity-90">Use GenAI for Work</div>
-                                </div>
-                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">71%</div>
-                                    <div class="text-sm opacity-90">Personal Usage</div>
-                                </div>
-                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">80%</div>
-                                    <div class="text-sm opacity-90">Use ChatGPT</div>
-                                </div>
-                                <div class="stat-card bg-gray-500 p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">6%</div>
-                                    <div class="text-sm opacity-90">No Usage Yet</div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Most Popular Activities</h3>
-                                    <ul class="text-sm space-y-2">
-                                        <li class="flex justify-between"><span>• Writing/Proofreading</span><span class="font-bold saheti-gold-text">71%</span></li>
-                                        <li class="flex justify-between"><span>• Research Assistant</span><span class="font-bold saheti-gold-text">67%</span></li>
-                                        <li class="flex justify-between"><span>• Educational Content</span><span class="font-bold saheti-gold-text">44%</span></li>
-                                        <li class="flex justify-between"><span>• Image Creation</span><span class="font-bold saheti-gold-text">35%</span></li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Recognized Benefits</h3>
-                                    <ul class="text-sm space-y-2">
-                                        <li class="flex justify-between"><span>• Improved Efficiency</span><span class="font-bold saheti-gold-text">73%</span></li>
-                                        <li class="flex justify-between"><span>• Enhanced Creativity</span><span class="font-bold saheti-gold-text">64%</span></li>
-                                        <li class="flex justify-between"><span>• Task Automation</span><span class="font-bold saheti-gold-text">65%</span></li>
-                                        <li class="flex justify-between"><span>• Better Quality Output</span><span class="font-bold saheti-gold-text">55%</span></li>
-                                    </ul>
-                                </div>
-                            </div>
+                <div class="bg-yellow-50 border border-yellow-200 p-6 rounded-lg">
+                    <h4 class="font-bold text-yellow-800 mb-4">Key Findings</h4>
+                    <div class="space-y-3 text-sm">
+                        <div class="bg-white p-3 rounded border-l-4 border-yellow-500">
+                            <strong>Confidence Gap:</strong> 40% feel neutral/unsure about GenAI capabilities
+                        </div>
+                        <div class="bg-white p-3 rounded border-l-4 border-yellow-500">
+                            <strong>Transparency Issue:</strong> 50% rarely/never inform students of GenAI use
+                        </div>
+                        <div class="bg-white p-3 rounded border-l-4 border-yellow-500">
+                            <strong>Implementation Challenge:</strong> High support but low actual usage
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Teaching Section -->
-                <div id="teaching" class="section">
-                    <div class="space-y-8">
-                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
-                            <div class="flex items-start mb-6">
-                                <div class="icon-container">
-                                    <i data-lucide="book-open" class="w-6 h-6"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h2 class="text-3xl font-bold saheti-navy-text">GenAI in Teaching <span class="text-lg font-normal text-gray-600">(92 Academic Staff)</span></h2>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">86%</div>
-                                    <div class="text-sm opacity-90">Support Curriculum Planning</div>
-                                </div>
-                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">88%</div>
-                                    <div class="text-sm opacity-90">Support Content Creation</div>
-                                </div>
-                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">56%</div>
-                                    <div class="text-sm opacity-90">Support Assessment Use</div>
-                                </div>
-                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">62%</div>
-                                    <div class="text-sm opacity-90">Use ChatGPT for Teaching</div>
-                                </div>
-                            </div>
+        <!-- Student Concerns Section -->
+        <div id="students-section" class="section-content hidden fade-in">
+            <div class="bg-red-100 border border-red-300 p-8 rounded-lg mb-8">
+                <div class="flex items-center mb-4">
+                    <i data-lucide="alert-triangle" class="text-red-600 mr-4 w-8 h-8"></i>
+                    <h2 class="text-2xl font-bold text-red-800">CRITICAL: Academic Integrity Crisis</h2>
+                </div>
+                <div class="grid md:grid-cols-4 gap-4">
+                    <div class="text-center bg-white p-4 rounded-lg">
+                        <div class="text-3xl font-bold text-red-600">91.2%</div>
+                        <div class="text-sm text-red-800">Concerned about AI misuse</div>
+                    </div>
+                    <div class="text-center bg-white p-4 rounded-lg">
+                        <div class="text-3xl font-bold text-red-600">92.2%</div>
+                        <div class="text-sm text-red-800">Suspect current abuse</div>
+                    </div>
+                    <div class="text-center bg-white p-4 rounded-lg">
+                        <div class="text-3xl font-bold text-red-600">35.8%</div>
+                        <div class="text-sm text-red-800">Have adapted assessments</div>
+                    </div>
+                    <div class="text-center bg-white p-4 rounded-lg">
+                        <div class="text-3xl font-bold text-red-600">54.4%</div>
+                        <div class="text-sm text-red-800">Critical action gap</div>
+                    </div>
+                </div>
+            </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg text-green-800 mb-4">Strong Support Areas</h3>
-                                    <ul class="text-sm text-green-700 space-y-2">
-                                        <li>• Lesson preparation & planning</li>
-                                        <li>• Teaching materials creation</li>
-                                        <li>• Administrative documentation</li>
-                                        <li>• Professional development support</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg text-amber-800 mb-4">Areas of Concern</h3>
-                                    <ul class="text-sm text-amber-700 space-y-2">
-                                        <li>• Student assessment & grading</li>
-                                        <li>• Content reliability & accuracy</li>
-                                        <li>• Professional ethics & accountability</li>
-                                        <li>• Role uncertainty & job impact</li>
-                                    </ul>
-                                </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border mb-8">
+                <h4 class="text-xl font-semibold mb-4">Academic Staff Concerns About Student Misuse</h4>
+                <div class="chart-container">
+                    <canvas id="concernsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-red-50 border border-red-200 p-6 rounded-lg">
+                <h4 class="text-xl font-semibold text-red-800 mb-4 flex items-center">
+                    <i data-lucide="shield" class="mr-3 w-6 h-6"></i>
+                    Suspected Current Abuse (Staff Perceptions)
+                </h4>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white p-6 rounded-lg text-center">
+                        <div class="text-4xl font-bold text-red-600 mb-2">92.2%</div>
+                        <div class="text-sm text-gray-700">Copying AI content</div>
+                        <div class="mt-3">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full transition-all duration-500" style="width: 92.2%"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Learners Section -->
-                <div id="learners" class="section">
-                    <div class="space-y-8">
-                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
-                            <div class="flex items-start mb-6">
-                                <div class="icon-container">
-                                    <i data-lucide="trending-up" class="w-6 h-6"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h2 class="text-3xl font-bold saheti-navy-text">GenAI for Learners <span class="text-lg font-normal text-gray-600">(Teacher Perspectives)</span></h2>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">67%</div>
-                                    <div class="text-sm opacity-90">Support Self-Assessment</div>
-                                </div>
-                                <div class="stat-card bg-red-600 p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">87%</div>
-                                    <div class="text-sm opacity-90">Fear Over-reliance</div>
-                                </div>
-                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">69%</div>
-                                    <div class="text-sm opacity-90">Academic Honesty Concerns</div>
-                                </div>
-                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">45%</div>
-                                    <div class="text-sm opacity-90">Suspect Current Abuse</div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg text-green-800 mb-4">Acceptable Student Uses</h3>
-                                    <ul class="text-sm text-green-700 space-y-2">
-                                        <li class="flex justify-between"><span>• Self-assessment & improvement</span><span class="font-bold">67%</span></li>
-                                        <li class="flex justify-between"><span>• Personalized learning support</span><span class="font-bold">62%</span></li>
-                                        <li class="flex justify-between"><span>• Study material generation</span><span class="font-bold">60%</span></li>
-                                        <li class="flex justify-between"><span>• Research assistance</span><span class="font-bold">57%</span></li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg text-red-800 mb-4">Major Misuse Concerns</h3>
-                                    <ul class="text-sm text-red-700 space-y-2">
-                                        <li class="flex justify-between"><span>• Over-reliance harming skills</span><span class="font-bold">87%</span></li>
-                                        <li class="flex justify-between"><span>• Copying without attribution</span><span class="font-bold">86%</span></li>
-                                        <li class="flex justify-between"><span>• Cheating on tests/exams</span><span class="font-bold">86%</span></li>
-                                        <li class="flex justify-between"><span>• Using AI without understanding</span><span class="font-bold">85%</span></li>
-                                    </ul>
-                                </div>
+                    <div class="bg-white p-6 rounded-lg text-center">
+                        <div class="text-4xl font-bold text-red-600 mb-2">90.7%</div>
+                        <div class="text-sm text-gray-700">No understanding</div>
+                        <div class="mt-3">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full transition-all duration-500" style="width: 90.7%"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Administration Section -->
-                <div id="admin" class="section">
-                    <div class="space-y-8">
-                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
-                            <div class="flex items-start mb-6">
-                                <div class="icon-container">
-                                    <i data-lucide="settings" class="w-6 h-6"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h2 class="text-3xl font-bold saheti-navy-text">GenAI in Administration <span class="text-lg font-normal text-gray-600">(20 Non-Teaching Staff)</span></h2>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">70%</div>
-                                    <div class="text-sm opacity-90">Support Admin Office Use</div>
-                                </div>
-                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">65%</div>
-                                    <div class="text-sm opacity-90">Use for Text Creation</div>
-                                </div>
-                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">70%</div>
-                                    <div class="text-sm opacity-90">See Efficiency Benefits</div>
-                                </div>
-                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">40%</div>
-                                    <div class="text-sm opacity-90">Ethical Concerns</div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">High Support Departments</h3>
-                                    <ul class="text-sm space-y-2">
-                                        <li class="flex justify-between"><span>• Administrative Office</span><span class="font-bold saheti-gold-text">70%</span></li>
-                                        <li class="flex justify-between"><span>• Marketing</span><span class="font-bold saheti-gold-text">65%</span></li>
-                                        <li class="flex justify-between"><span>• IT Department</span><span class="font-bold saheti-gold-text">60%</span></li>
-                                        <li class="flex justify-between"><span>• HR</span><span class="font-bold saheti-gold-text">55%</span></li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Current Usage Patterns</h3>
-                                    <ul class="text-sm space-y-2">
-                                        <li class="flex justify-between"><span>• Text creation & editing</span><span class="font-bold saheti-gold-text">65%</span></li>
-                                        <li class="flex justify-between"><span>• Research & information</span><span class="font-bold saheti-gold-text">50%</span></li>
-                                        <li class="flex justify-between"><span>• Meeting preparation</span><span class="font-bold saheti-gold-text">25%</span></li>
-                                        <li class="flex justify-between"><span>• Media creation</span><span class="font-bold saheti-gold-text">20%</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Demographics Section -->
-                <div id="demographics" class="section">
-                    <div class="space-y-8">
-                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
-                            <div class="flex items-start mb-6">
-                                <div class="icon-container">
-                                    <i data-lucide="monitor" class="w-6 h-6"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h2 class="text-3xl font-bold saheti-navy-text">Staff Demographics & IT Proficiency</h2>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">92</div>
-                                    <div class="text-sm opacity-90">Teaching Staff</div>
-                                </div>
-                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">20</div>
-                                    <div class="text-sm opacity-90">Non-Teaching Staff</div>
-                                </div>
-                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">18</div>
-                                    <div class="text-sm opacity-90">Median Teaching Experience</div>
-                                </div>
-                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">26</div>
-                                    <div class="text-sm opacity-90">Median Work Experience</div>
-                                </div>
-                                <div class="stat-card bg-teal-600 p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">99%</div>
-                                    <div class="text-sm opacity-90">Teachers Moderate+ IT Skills</div>
-                                </div>
-                                <div class="stat-card bg-cyan-600 p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">100%</div>
-                                    <div class="text-sm opacity-90">Non-Teachers Moderate+ IT Skills</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feedback Section -->
-                <div id="feedback" class="section">
-                    <div class="space-y-8">
-                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
-                            <div class="flex items-start mb-6">
-                                <div class="icon-container">
-                                    <i data-lucide="message-square" class="w-6 h-6"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h2 class="text-3xl font-bold saheti-navy-text">Open Feedback & Suggestions</h2>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                                <div class="stat-card saheti-navy-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">76%</div>
-                                    <div class="text-sm opacity-90">Want Training</div>
-                                </div>
-                                <div class="stat-card saheti-blue-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">61%</div>
-                                    <div class="text-sm opacity-90">Want Paid Tools</div>
-                                </div>
-                                <div class="stat-card saheti-gold-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">58%</div>
-                                    <div class="text-sm opacity-90">Need Approved List</div>
-                                </div>
-                                <div class="stat-card saheti-accent-bg p-6 rounded-xl text-center text-white">
-                                    <div class="text-3xl font-bold mb-2">82</div>
-                                    <div class="text-sm opacity-90">Detailed Responses</div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Top Support Requests</h3>
-                                    <ul class="text-sm space-y-2">
-                                        <li>• Hands-on training workshops (76%)</li>
-                                        <li>• Premium tool subscriptions (61%)</li>
-                                        <li>• Vetted approved tools list (58%)</li>
-                                        <li>• Clear policies and guidelines</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="metric-highlight p-6 rounded-xl">
-                                    <h3 class="font-bold text-lg saheti-navy-text mb-4">Desired Use Cases</h3>
-                                    <ul class="text-sm space-y-2">
-                                        <li>• Lesson planning & preparation</li>
-                                        <li>• Teaching resources creation</li>
-                                        <li>• Student support & differentiation</li>
-                                        <li>• Administrative & communication tasks</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recommendations Section -->
-                <div id="recommendations" class="section">
-                    <div class="space-y-8">
-                        <div class="saheti-card rounded-xl shadow-lg p-8 section-card">
-                            <div class="flex items-start mb-6">
-                                <div class="icon-container">
-                                    <i data-lucide="target" class="w-6 h-6"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h2 class="text-3xl font-bold saheti-navy-text">Recommendations & Action Plan</h2>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                                <div class="p-6 rounded-xl text-center border-2 border-red-200 bg-red-50">
-                                    <div class="text-lg font-bold text-red-600">Immediate</div>
-                                    <div class="text-sm text-gray-600">Policies & Tools</div>
-                                </div>
-                                <div class="p-6 rounded-xl text-center border-2 border-orange-200 bg-orange-50">
-                                    <div class="text-lg font-bold text-orange-600">Short-term</div>
-                                    <div class="text-sm text-gray-600">Training & Infrastructure</div>
-                                </div>
-                                <div class="p-6 rounded-xl text-center border-2 border-blue-200 bg-blue-50">
-                                    <div class="text-lg font-bold saheti-navy-text">Medium-term</div>
-                                    <div class="text-sm text-gray-600">Pilots & Education</div>
-                                </div>
-                                <div class="p-6 rounded-xl text-center border-2 border-green-200 bg-green-50">
-                                    <div class="text-lg font-bold text-green-600">Long-term</div>
-                                    <div class="text-sm text-gray-600">Monitor & Optimize</div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-6">
-                                <div class="border rounded-xl p-6 border-l-4 priority-immediate bg-red-50">
-                                    <h3 class="font-bold text-lg flex items-center mb-3">
-                                        <i data-lucide="shield" class="w-6 h-6 mr-3 text-red-600"></i>
-                                        1. Develop Clear GenAI Usage Policies
-                                    </h3>
-                                    <p class="text-gray-700 mb-3">Create comprehensive policies for ethical staff and student use</p>
-                                    <span class="bg-red-100 text-red-800 px-4 py-2 rounded-full text-sm font-medium">Immediate Priority</span>
-                                </div>
-                                
-                                <div class="border rounded-xl p-6 border-l-4 priority-short bg-orange-50">
-                                    <h3 class="font-bold text-lg flex items-center mb-3">
-                                        <i data-lucide="users" class="w-6 h-6 mr-3 text-orange-600"></i>
-                                        2. Provide Comprehensive Training
-                                    </h3>
-                                    <p class="text-gray-700 mb-3">Tiered training program from basic to advanced AI applications</p>
-                                    <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">Short-term Priority</span>
-                                </div>
-                                
-                                <div class="border rounded-xl p-6 border-l-4 priority-medium bg-blue-50">
-                                    <h3 class="font-bold text-lg flex items-center mb-3">
-                                        <i data-lucide="book-open" class="w-6 h-6 mr-3 saheti-navy-text"></i>
-                                        3. Launch Pilot Projects
-                                    </h3>
-                                    <p class="text-gray-700 mb-3">Structured pilots to demonstrate effective AI integration</p>
-                                    <span class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">Medium-term Priority</span>
-                                </div>
-                            </div>
-
-                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 border border-blue-200 mt-8">
-                                <h3 class="text-2xl font-bold mb-6 saheti-navy-text">Expected Outcomes</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                    <div class="outcome-efficiency p-6 rounded-xl">
-                                        <h4 class="font-bold text-lg text-green-800 mb-4">Efficiency Gains:</h4>
-                                        <ul class="text-green-700 space-y-2">
-                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Reduced lesson planning time</li>
-                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Faster administrative reporting</li>
-                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Enhanced student engagement</li>
-                                        </ul>
-                                    </div>
-                                    <div class="outcome-development p-6 rounded-xl">
-                                        <h4 class="font-bold text-lg saheti-navy-text mb-4">Staff Development:</h4>
-                                        <ul class="text-blue-700 space-y-2">
-                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Increased AI comfort levels</li>
-                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Higher tool adoption rates</li>
-                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Innovation in teaching methods</li>
-                                        </ul>
-                                    </div>
-                                    <div class="outcome-mitigation p-6 rounded-xl">
-                                        <h4 class="font-bold text-lg saheti-gold-text mb-4">Risk Mitigation:</h4>
-                                        <ul class="text-amber-700 space-y-2">
-                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Maintained academic integrity</li>
-                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Clear ethical guidelines</li>
-                                            <li class="flex items-start"><span class="font-bold mr-2">•</span> Controlled student AI use</li>
-                                        </ul>
-                                    </div>
-                                </div>
+                    <div class="bg-white p-6 rounded-lg text-center">
+                        <div class="text-4xl font-bold text-red-600 mb-2">85.3%</div>
+                        <div class="text-sm text-gray-700">Bypassing detection</div>
+                        <div class="mt-3">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full transition-all duration-500" style="width: 85.3%"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Administrative Staff Section -->
+        <div id="admin-section" class="section-content hidden fade-in">
+            <div class="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-lg border mb-8">
+                <h3 class="text-2xl font-semibold mb-4 text-gray-800">Strong Administrative Support</h3>
+                <p class="text-gray-700 mb-4">
+                    Non-academic staff strongly support GenAI integration into administrative functions, with
+                    <strong class="text-blue-600"> 81.9% supporting Operations & Support</strong> applications.
+                </p>
+                <div class="bg-green-100 border border-green-200 p-4 rounded-lg">
+                    <p class="text-green-800">
+                        <strong>Key Opportunity:</strong> Institution has yet to leverage GenAI for deep process automation 
+                        or advanced data analysis. Significant untapped potential exists.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                <h4 class="text-xl font-semibold mb-4">Current Administrative Usage Patterns</h4>
+                <div class="chart-container">
+                    <canvas id="adminChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Assistance Section -->
+        <div id="assistance-section" class="section-content hidden fade-in">
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border mb-8">
+                <h3 class="text-2xl font-semibold mb-4 text-gray-800">What Staff Want From The IIE</h3>
+                <p class="text-gray-700 mb-4">
+                    Survey respondents identified the most important types of assistance The IIE could provide 
+                    to support their GenAI usage. Training emerges as the top priority, followed by financial 
+                    and infrastructure support.
+                </p>
+                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg">
+                    <p class="text-blue-800">
+                        <strong>Key Insight:</strong> The top three requests (training, licenses, approved apps) 
+                        all exceed 75% support, indicating strong consensus on institutional needs.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border mb-8">
+                <h4 class="text-xl font-semibold mb-4">Staff Assistance Priorities</h4>
+                <div class="chart-container">
+                    <canvas id="assistanceChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-red-50 border border-red-200 p-6 rounded-lg">
+                    <h4 class="font-bold text-red-800 mb-4 flex items-center">
+                        <i data-lucide="alert-triangle" class="mr-2 w-5 h-5"></i>
+                        High Priority (75%+)
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="bg-white p-3 rounded border-l-4 border-red-500">
+                            <div class="font-semibold text-red-700">Training</div>
+                            <div class="text-sm text-red-600">81.6% (270 responses)</div>
+                        </div>
+                        <div class="bg-white p-3 rounded border-l-4 border-red-500">
+                            <div class="font-semibold text-red-700">License/subscription fees</div>
+                            <div class="text-sm text-red-600">76.4% (253 responses)</div>
+                        </div>
+                        <div class="bg-white p-3 rounded border-l-4 border-red-500">
+                            <div class="font-semibold text-red-700">Approved apps list</div>
+                            <div class="text-sm text-red-600">75.8% (251 responses)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 p-6 rounded-lg">
+                    <h4 class="font-bold text-yellow-800 mb-4 flex items-center">
+                        <i data-lucide="settings" class="mr-2 w-5 h-5"></i>
+                        Medium Priority (55-75%)
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="bg-white p-3 rounded border-l-4 border-yellow-500">
+                            <div class="font-semibold text-yellow-700">Resource materials</div>
+                            <div class="text-sm text-yellow-600">70.1% (232 responses)</div>
+                        </div>
+                        <div class="bg-white p-3 rounded border-l-4 border-yellow-500">
+                            <div class="font-semibold text-yellow-700">Technical support</div>
+                            <div class="text-sm text-yellow-600">55.9% (185 responses)</div>
+                        </div>
+                        <div class="bg-white p-3 rounded border-l-4 border-yellow-500">
+                            <div class="font-semibold text-yellow-700">Community/peer support</div>
+                            <div class="text-sm text-yellow-600">55.3% (183 responses)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 border border-green-200 p-6 rounded-lg">
+                    <h4 class="font-bold text-green-800 mb-4 flex items-center">
+                        <i data-lucide="check-circle" class="mr-2 w-5 h-5"></i>
+                        Strategic Implications
+                    </h4>
+                    <div class="space-y-3 text-sm">
+                        <div class="bg-white p-3 rounded border-l-4 border-green-500">
+                            <strong>Training is Essential:</strong> Over 80% want formal training programs
+                        </div>
+                        <div class="bg-white p-3 rounded border-l-4 border-green-500">
+                            <strong>Infrastructure Investment:</strong> 76% want institutional license support
+                        </div>
+                        <div class="bg-white p-3 rounded border-l-4 border-green-500">
+                            <strong>Governance Need:</strong> 76% want approved apps guidance
+                        </div>
+                        <div class="bg-white p-3 rounded border-l-4 border-green-500">
+                            <strong>Support Systems:</strong> Majority want resources and technical help
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div id="recommendations-section" class="section-content hidden fade-in">
+            <div class="bg-gradient-to-r from-blue-50 to-green-50 p-8 rounded-lg border mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Strategic Recommendations Framework</h2>
+                <p class="text-gray-700 text-lg mb-6">
+                    The IIE must move swiftly from ungoverned, ad-hoc adoption to a structured, strategic deployment. 
+                    We recommend a strategy built on three pillars:
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-red-50 border border-red-200 p-6 rounded-lg text-center">
+                        <i data-lucide="shield" class="mx-auto text-red-600 mb-3 w-8 h-8"></i>
+                        <h3 class="font-bold text-red-800">Governance & Integrity</h3>
+                        <p class="text-sm text-red-700">Urgent Priority</p>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 p-6 rounded-lg text-center">
+                        <i data-lucide="settings" class="mx-auto text-blue-600 mb-3 w-8 h-8"></i>
+                        <h3 class="font-bold text-blue-800">Operational Efficiency</h3>
+                        <p class="text-sm text-blue-700">Infrastructure & Innovation</p>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 p-6 rounded-lg text-center">
+                        <i data-lucide="book-open" class="mx-auto text-green-600 mb-3 w-8 h-8"></i>
+                        <h3 class="font-bold text-green-800">Capacity Building</h3>
+                        <p class="text-sm text-green-700">Comprehensive Literacy</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-sm border mb-8">
+                <h3 class="text-2xl font-bold text-red-800 mb-6 flex items-center">
+                    <i data-lucide="shield" class="mr-3 w-7 h-7"></i>
+                    Pillar 1: Governance & Academic Integrity (URGENT PRIORITY)
+                </h3>
+                <div class="space-y-6">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="border-l-4 border-red-500 pl-6">
+                            <h4 class="font-bold text-red-700 mb-2">Assessment Modernization Initiative</h4>
+                            <p class="text-sm text-red-600 mb-2"><strong>Timeline:</strong> 3-12 Months (Phased)</p>
+                            <p class="text-red-600">Launch cross-divisional task force to urgently redesign assessments, 
+                            prioritizing authentic assessment over formats vulnerable to GenAI.</p>
+                        </div>
+                        <div class="border-l-4 border-orange-500 pl-6">
+                            <h4 class="font-bold text-orange-700 mb-2">Ethical Use & Disclosure Policy</h4>
+                            <p class="text-sm text-orange-600 mb-2"><strong>Timeline:</strong> 1-3 Months</p>
+                            <p class="text-orange-600">Develop comprehensive policies for acceptable use, data privacy, 
+                            and mandatory disclosure of GenAI assistance.</p>
+                        </div>
+                        <div class="border-l-4 border-yellow-500 pl-6">
+                            <h4 class="font-bold text-yellow-700 mb-2">AI Detection & Response Framework</h4>
+                            <p class="text-sm text-yellow-600 mb-2"><strong>Timeline:</strong> 3 Months</p>
+                            <p class="text-yellow-600">Deploy advanced AI-detection tools with clear protocols for 
+                            investigation and response, emphasizing education over punishment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 p-8 rounded-lg border border-blue-200">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Call to Action</h3>
+                <p class="text-gray-700 text-lg mb-4">
+                    This framework requires institutional investment in infrastructure, policy development, and 
+                    organizational change management. The IIE must act decisively to transform from crisis to 
+                    competitive advantage.
+                </p>
+                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg">
+                    <p class="text-blue-800">
+                        <strong>Next Steps:</strong> We recommend immediate engagement with specialized consultancy 
+                        expertise to ensure successful implementation of this comprehensive GenAI strategy.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gray-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center">
+                <p class="text-sm text-gray-300">
+                    Deep Research Report: Strategic Adoption of Generative AI at The IIE | 
+                    Prepared by Imagineers.Ai | September 2025
+                </p>
+            </div>
+        </div>
     </div>
 
     <script>
-        const sections = [
-            { id: 'overview', title: 'Executive Summary' },
-            { id: 'general', title: 'General Usage & Attitudes' },
-            { id: 'teaching', title: 'GenAI in Teaching' },
-            { id: 'learners', title: 'GenAI for Learners' },
-            { id: 'admin', title: 'GenAI in Administration' },
-            { id: 'demographics', title: 'Staff Demographics & IT' },
-            { id: 'feedback', title: 'Open Feedback' },
-            { id: 'recommendations', title: 'Recommendations' }
-        ];
+        // Initialize Lucide icons
+        lucide.createIcons();
 
-        let currentSectionIndex = 0;
+        // Chart instances storage
+        let charts = {};
 
-        function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Remove active class from all nav buttons
-            document.querySelectorAll('.nav-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Show selected section with animation
-            const targetSection = document.getElementById(sectionId);
-            targetSection.classList.add('active');
-            
-            // Find and activate the correct nav button by matching the onclick attribute
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
             const navButtons = document.querySelectorAll('.nav-button');
-            navButtons.forEach(btn => {
-                const onclickAttr = btn.getAttribute('onclick');
-                if (onclickAttr && onclickAttr.includes(`'${sectionId}'`)) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            // Update current section index
-            currentSectionIndex = sections.findIndex(s => s.id === sectionId);
-            
-            // Animate stat cards in stagger
-            setTimeout(() => {
-                const statCards = targetSection.querySelectorAll('.stat-card');
-                statCards.forEach((card, index) => {
-                    card.style.animationDelay = (index * 0.1) + 's';
-                    card.classList.add('stagger-animation');
+            const sections = document.querySelectorAll('.section-content');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetSection = this.getAttribute('data-section');
+                    
+                    // Update active navigation
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show target section, hide others
+                    sections.forEach(section => {
+                        if (section.id === targetSection + '-section') {
+                            section.classList.remove('hidden');
+                            section.classList.add('fade-in');
+                            // Initialize charts for this section
+                            initializeChartsForSection(targetSection);
+                        } else {
+                            section.classList.add('hidden');
+                            section.classList.remove('fade-in');
+                        }
+                    });
                 });
-            }, 100);
+            });
+
+            // Initialize charts for overview section (default)
+            initializeChartsForSection('overview');
+        });
+
+        function initializeChartsForSection(section) {
+            switch(section) {
+                case 'overview':
+                    createAdoptionChart();
+                    createToolsChart();
+                    break;
+                case 'academic':
+                    createGapChart();
+                    break;
+                case 'students':
+                    createConcernsChart();
+                    break;
+                case 'admin':
+                    createAdminChart();
+                    break;
+                case 'assistance':
+                    createAssistanceChart();
+                    break;
+            }
         }
 
-        // Add smooth scrolling and enhanced interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Lucide icons
-            lucide.createIcons();
+        function createAdoptionChart() {
+            if (charts.adoption) charts.adoption.destroy();
             
-            // Add hover effects to metric cards
-            document.querySelectorAll('.metric-highlight').forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-4px)';
-                    this.style.boxShadow = '0 20px 25px -5px rgba(26, 54, 93, 0.1)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
-                });
-            });
-
-            // Add progressive loading animation to stat cards
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const statCards = entry.target.querySelectorAll('.stat-card');
-                        statCards.forEach((card, index) => {
-                            setTimeout(() => {
-                                card.style.opacity = '1';
-                                card.style.transform = 'translateY(0) scale(1)';
-                            }, index * 150);
-                        });
-                        observer.unobserve(entry.target);
+            const ctx = document.getElementById('adoptionChart');
+            if (!ctx) return;
+            
+            charts.adoption = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Personal Use', 'Work Use', 'No Use'],
+                    datasets: [{
+                        data: [86.7, 77.0, 13.3],
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
                     }
-                });
-            }, observerOptions);
-
-            // Observe all sections for animations
-            document.querySelectorAll('.section').forEach(section => {
-                observer.observe(section);
-                
-                // Initialize stat cards as hidden
-                const statCards = section.querySelectorAll('.stat-card');
-                statCards.forEach(card => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(30px) scale(0.95)';
-                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-                });
-            });
-
-            // Parallax effect removed for better UX
-
-            // Initialize first section animations
-            setTimeout(() => {
-                const firstSection = document.querySelector('.section.active');
-                if (firstSection) {
-                    const statCards = firstSection.querySelectorAll('.stat-card');
-                    statCards.forEach((card, index) => {
-                        setTimeout(() => {
-                            card.style.opacity = '1';
-                            card.style.transform = 'translateY(0) scale(1)';
-                        }, index * 150);
-                    });
                 }
-            }, 500);
-        });
+            });
+        }
+
+        function createToolsChart() {
+            if (charts.tools) charts.tools.destroy();
+            
+            const ctx = document.getElementById('toolsChart');
+            if (!ctx) return;
+            
+            charts.tools = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ChatGPT', 'Meta AI', 'Microsoft Copilot', 'Other Tools'],
+                    datasets: [{
+                        label: 'Usage Rate (%)',
+                        data: [89.1, 49.8, 47.1, 25.0],
+                        backgroundColor: '#3B82F6',
+                        borderColor: '#1E40AF',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Usage Rate (%)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createGapChart() {
+            if (charts.gap) charts.gap.destroy();
+            
+            const ctx = document.getElementById('gapChart');
+            if (!ctx) return;
+            
+            charts.gap = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Content Creation', 'Curriculum Planning', 'Assessment & Feedback'],
+                    datasets: [{
+                        label: 'Support (%)',
+                        data: [85.8, 85.8, 64.7],
+                        backgroundColor: '#10B981'
+                    }, {
+                        label: 'Usage (%)',
+                        data: [60.8, 54.4, 27.9],
+                        backgroundColor: '#3B82F6'
+                    }, {
+                        label: 'Gap (%)',
+                        data: [25.0, 31.4, 36.8],
+                        backgroundColor: '#EF4444'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Percentage (%)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createConcernsChart() {
+            if (charts.concerns) charts.concerns.destroy();
+            
+            const ctx = document.getElementById('concernsChart');
+            if (!ctx) return;
+            
+            charts.concerns = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['AI without understanding', 'Copying without attribution', 'Reduced critical thinking'],
+                    datasets: [{
+                        label: 'Concern Level (%)',
+                        data: [91.2, 90.2, 88.7],
+                        backgroundColor: '#DC2626',
+                        borderColor: '#991B1B',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Concern Level (%)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createAdminChart() {
+            if (charts.admin) charts.admin.destroy();
+            
+            const ctx = document.getElementById('adminChart');
+            if (!ctx) return;
+            
+            charts.admin = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Text creation', 'Research & intelligence', 'Media creation', 'Technical tasks'],
+                    datasets: [{
+                        label: 'Usage (%)',
+                        data: [55.1, 52.8, 29.9, 15.0],
+                        backgroundColor: '#3B82F6',
+                        borderColor: '#1E40AF',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 60,
+                            title: {
+                                display: true,
+                                text: 'Usage (%)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createAssistanceChart() {
+            if (charts.assistance) charts.assistance.destroy();
+            
+            const ctx = document.getElementById('assistanceChart');
+            if (!ctx) return;
+            
+            charts.assistance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        'Training', 
+                        'License fees', 
+                        'Approved apps', 
+                        'Resources', 
+                        'Technical support', 
+                        'Community support', 
+                        'Other'
+                    ],
+                    datasets: [{
+                        label: 'Staff Support (%)',
+                        data: [81.6, 76.4, 75.8, 70.1, 55.9, 55.3, 9.7],
+                        backgroundColor: '#3B82F6',
+                        borderColor: '#1E40AF',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 90,
+                            title: {
+                                display: true,
+                                text: 'Staff Support (%)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                fontSize: 11
+                            }
+                        }
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
