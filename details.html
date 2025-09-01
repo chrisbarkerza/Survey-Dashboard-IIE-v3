@@ -532,17 +532,31 @@
                     throw new Error(`Failed to load CSV: ${response.status} ${response.statusText}`);
                 }
                 
-                const csvText = await response.text();
+                let csvText = await response.text();
                 console.log('CSV loaded successfully:', csvText.substring(0, 100) + '...');
                 
-                // Parse CSV
-                const lines = csvText.split('\n');
-                const headers = parseCSVLine(lines[0]);
+                // Remove BOM if present
+                if (csvText.charCodeAt(0) === 0xFEFF) {
+                    csvText = csvText.slice(1);
+                    console.log('BOM removed from CSV');
+                }
                 
+                // Normalize line endings to \n
+                csvText = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                
+                // Parse CSV using robust parser
+                const parsedData = parseCSV(csvText);
+                
+                if (parsedData.length === 0) {
+                    throw new Error('No data found in CSV');
+                }
+                
+                const headers = parsedData[0];
                 surveyData = [];
-                for (let i = 1; i < lines.length; i++) {
-                    if (lines[i].trim()) {
-                        const values = parseCSVLine(lines[i]);
+                
+                for (let i = 1; i < parsedData.length; i++) {
+                    const values = parsedData[i];
+                    if (values && values.length > 0) {
                         const row = {};
                         headers.forEach((header, index) => {
                             row[header] = values[index] || '';
@@ -586,38 +600,73 @@
             }
         }
 
-        // Improved CSV parser that handles mixed quoting
-        function parseCSVLine(line) {
-            const result = [];
-            let current = '';
+        // Robust CSV parser that handles quotes, newlines, and edge cases
+        function parseCSV(csvText) {
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
             let inQuotes = false;
+            let i = 0;
             
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
+            while (i < csvText.length) {
+                const char = csvText[i];
+                const nextChar = csvText[i + 1];
                 
                 if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
-                    // Clean up the field - remove quotes and trim
-                    let field = current.trim();
-                    if (field.startsWith('"') && field.endsWith('"')) {
-                        field = field.slice(1, -1);
+                    if (inQuotes) {
+                        // Check if it's an escaped quote ("")
+                        if (nextChar === '"') {
+                            currentField += '"';
+                            i += 2;
+                            continue;
+                        } else {
+                            // End of quoted field
+                            inQuotes = false;
+                            i++;
+                            continue;
+                        }
+                    } else {
+                        // Start of quoted field
+                        inQuotes = true;
+                        i++;
+                        continue;
                     }
-                    result.push(field);
-                    current = '';
-                } else {
-                    current += char;
+                }
+                
+                if (!inQuotes) {
+                    if (char === ',') {
+                        // End of field
+                        currentRow.push(currentField);
+                        currentField = '';
+                        i++;
+                        continue;
+                    } else if (char === '\n') {
+                        // End of row
+                        currentRow.push(currentField);
+                        if (currentRow.length > 0 && currentRow.some(field => field.trim() !== '')) {
+                            rows.push(currentRow);
+                        }
+                        currentRow = [];
+                        currentField = '';
+                        i++;
+                        continue;
+                    }
+                }
+                
+                // Regular character
+                currentField += char;
+                i++;
+            }
+            
+            // Handle last field and row
+            if (currentField !== '' || currentRow.length > 0) {
+                currentRow.push(currentField);
+                if (currentRow.length > 0 && currentRow.some(field => field.trim() !== '')) {
+                    rows.push(currentRow);
                 }
             }
             
-            // Handle the last field
-            let field = current.trim();
-            if (field.startsWith('"') && field.endsWith('"')) {
-                field = field.slice(1, -1);
-            }
-            result.push(field);
-            
-            return result;
+            return rows;
         }
 
         // Populate question dropdown
@@ -788,12 +837,57 @@
             return result;
         }
 
+        // Helper function to find matching column by first 5 characters
+        function findMatchingColumn(questionHeader, row) {
+            if (!questionHeader || !row) return null;
+            
+            const questionPrefix = questionHeader.substring(0, 5).toLowerCase();
+            console.log(`Looking for column matching prefix: "${questionPrefix}" for question: "${questionHeader}"`);
+            
+            // First try exact match (for backward compatibility)
+            if (row.hasOwnProperty(questionHeader)) {
+                console.log(`Found exact match for column: "${questionHeader}"`);
+                return questionHeader;
+            }
+            
+            // Then try prefix matching
+            const columns = Object.keys(row);
+            for (const col of columns) {
+                const colPrefix = col.substring(0, 5).toLowerCase();
+                if (colPrefix === questionPrefix) {
+                    console.log(`Found prefix match: "${col}" matches "${questionHeader}" by prefix "${questionPrefix}"`);
+                    return col;
+                }
+            }
+            
+            console.log(`No match found for question: "${questionHeader}" with prefix "${questionPrefix}"`);
+            return null;
+        }
+
         // Analyze question data
         function analyzeQuestion(questionHeader) {
             const filteredData = getFilteredData();
-            const responses = filteredData.map(row => row[questionHeader]).filter(r => r && r.trim() !== '');
+            
+            // Find the matching column using 5-character prefix
+            let matchingColumn = null;
+            if (filteredData.length > 0) {
+                matchingColumn = findMatchingColumn(questionHeader, filteredData[0]);
+            }
+            
+            if (!matchingColumn) {
+                console.log(`No matching column found for question: "${questionHeader}"`);
+                return {
+                    responses: [],
+                    counts: {},
+                    total: 0,
+                    unique: 0
+                };
+            }
+            
+            const responses = filteredData.map(row => row[matchingColumn]).filter(r => r && r.trim() !== '');
             
             console.log(`Analyzing question "${questionHeader}" with filter "${currentFilter}"`);
+            console.log(`Using column "${matchingColumn}" for data extraction`);
             console.log(`Filtered data length: ${filteredData.length}, Valid responses: ${responses.length}`);
             
             // Count response frequencies
@@ -900,8 +994,14 @@
             let processedAnalysis = analysis;
             if (analysis.unique >= 6) {
                 const filteredData = getFilteredData();
-                const responses = filteredData.map(row => row[questionHeader]).filter(r => r && r.trim() !== '');
-                processedAnalysis = parseCommaSeparatedResponses(responses);
+                let matchingColumn = null;
+                if (filteredData.length > 0) {
+                    matchingColumn = findMatchingColumn(questionHeader, filteredData[0]);
+                }
+                if (matchingColumn) {
+                    const responses = filteredData.map(row => row[matchingColumn]).filter(r => r && r.trim() !== '');
+                    processedAnalysis = parseCommaSeparatedResponses(responses);
+                }
             }
             
             // Prepare data
@@ -1399,12 +1499,18 @@
             // For questions with many unique responses, try parsing as comma-separated text
             if (analysis.unique >= 6) {
                 const filteredData = getFilteredData();
-                const responses = filteredData.map(row => row[currentQuestion]).filter(r => r && r.trim() !== '');
-                const parsedAnalysis = parseCommaSeparatedResponses(responses);
-                
-                // Use parsed analysis if it results in fewer unique items (indicates successful parsing)
-                if (parsedAnalysis.unique < analysis.unique && parsedAnalysis.unique > 0) {
-                    analysis = parsedAnalysis;
+                let matchingColumn = null;
+                if (filteredData.length > 0) {
+                    matchingColumn = findMatchingColumn(currentQuestion, filteredData[0]);
+                }
+                if (matchingColumn) {
+                    const responses = filteredData.map(row => row[matchingColumn]).filter(r => r && r.trim() !== '');
+                    const parsedAnalysis = parseCommaSeparatedResponses(responses);
+                    
+                    // Use parsed analysis if it results in fewer unique items (indicates successful parsing)
+                    if (parsedAnalysis.unique < analysis.unique && parsedAnalysis.unique > 0) {
+                        analysis = parsedAnalysis;
+                    }
                 }
             }
             
