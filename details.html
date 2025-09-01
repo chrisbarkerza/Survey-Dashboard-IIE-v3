@@ -128,6 +128,32 @@
             box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
         }
 
+        .school-button {
+            background: rgba(200, 16, 46, 0.1);
+            color: var(--saheti-navy);
+            border: 2px solid rgba(200, 16, 46, 0.3);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .school-button:hover {
+            background: rgba(200, 16, 46, 0.2);
+            border-color: var(--saheti-gold);
+            transform: translateY(-1px);
+        }
+
+        .school-button.active {
+            background: linear-gradient(135deg, var(--saheti-gold), var(--saheti-light-gold));
+            color: var(--saheti-navy);
+            border-color: var(--saheti-gold);
+            box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+        }
+
         .select-enhanced {
             background: white;
             border: 2px solid rgba(181, 163, 106, 0.3);
@@ -368,11 +394,26 @@
                             </button>
                         </div>
                     </div>
-                    <!-- Filter Tabs -->
+                    <!-- Staff Type Filter Tabs -->
                     <div class="flex space-x-2">
                         <button class="tab-button active" data-filter="all">All Staff</button>
                         <button class="tab-button" data-filter="academic">Academic Staff</button>
                         <button class="tab-button" data-filter="non-teaching">Non-teaching Staff</button>
+                    </div>
+                </div>
+                <!-- School/Brand Filter Row -->
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="text-lg font-semibold text-gray-700">Filter by School/Brand:</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="school-button active" data-school="all">All Schools</button>
+                            <button class="school-button" data-school="varsity">Varsity College</button>
+                            <button class="school-button" data-school="rosebank">Rosebank College</button>
+                            <button class="school-button" data-school="vega">Vega School</button>
+                            <button class="school-button" data-school="msa">MSA</button>
+                            <button class="school-button" data-school="hospitality">Hospitality & Service</button>
+                            <button class="school-button" data-school="central">Central Academic</button>
+                        </div>
                     </div>
                 </div>
                 <!-- Dropdown Row -->
@@ -415,8 +456,10 @@
         let currentChart = null;
         let currentQuestion = '';
         let currentFilter = 'all';
+        let currentSchoolFilter = 'all';
         let questionOptions = [];
         let roleColumnName = '';
+        let schoolColumnName = '';
 
         // Initialize AOS
         AOS.init({
@@ -517,6 +560,12 @@
                 roleColumnName = headers.find(h => h.includes(roleColumnPattern));
                 console.log('Found role column:', roleColumnName);
                 console.log('Sample role values:', surveyData.slice(0, 5).map(row => row[roleColumnName]));
+                
+                // Find the school column by searching for partial match
+                const schoolColumnPattern = 'At which brand/department do you work';
+                schoolColumnName = headers.find(h => h.includes(schoolColumnPattern));
+                console.log('Found school column:', schoolColumnName);
+                console.log('Sample school values:', surveyData.slice(0, 5).map(row => row[schoolColumnName]));
                 
                 populateQuestionDropdown(headers);
                 updateStats();
@@ -662,21 +711,81 @@
             if (filteredEl) filteredEl.textContent = filteredData.length;
         }
 
-        // Get filtered data based on current filter
+        // Get filtered data based on current filters (both staff type and school)
         function getFilteredData() {
-            if (currentFilter === 'all') {
-                return surveyData;
+            console.log(`Filtering data: staffFilter="${currentFilter}", schoolFilter="${currentSchoolFilter}"`);
+            console.log(`School column name: "${schoolColumnName}"`);
+            console.log(`Role column name: "${roleColumnName}"`);
+            console.log(`Total survey data rows: ${surveyData.length}`);
+            
+            // Debug: Show available columns
+            if (surveyData.length > 0) {
+                console.log('Available column headers:', Object.keys(surveyData[0]));
+                console.log('School column exists?', schoolColumnName in surveyData[0]);
+                console.log('First row school value:', surveyData[0][schoolColumnName]);
             }
             
-            return surveyData.filter(row => {
-                const roleClassification = classifyRole(row[roleColumnName]);
-                if (currentFilter === 'academic') {
-                    return roleClassification === 'academic';
-                } else if (currentFilter === 'non-teaching') {
-                    return roleClassification === 'non-academic';
+            const filtered = surveyData.filter(row => {
+                // Staff type filter
+                let staffMatch = true;
+                if (currentFilter !== 'all') {
+                    const roleClassification = classifyRole(row[roleColumnName]);
+                    if (currentFilter === 'academic') {
+                        staffMatch = roleClassification === 'academic';
+                    } else if (currentFilter === 'non-teaching') {
+                        staffMatch = roleClassification === 'non-academic';
+                    }
                 }
-                return true;
+                
+                // School filter
+                let schoolMatch = true;
+                if (currentSchoolFilter !== 'all') {
+                    const schoolValue = row[schoolColumnName];
+                    schoolMatch = matchesSchoolFilter(schoolValue, currentSchoolFilter);
+                }
+                
+                return staffMatch && schoolMatch;
             });
+            
+            console.log(`Filtered results: ${filtered.length} rows`);
+            return filtered;
+        }
+
+        // Helper function to match school filter
+        function matchesSchoolFilter(schoolValue, filter) {
+            console.log(`Matching school: "${schoolValue}" against filter: "${filter}"`);
+            if (!schoolValue) {
+                console.log('No school value, returning false');
+                return false;
+            }
+            
+            let result = false;
+            // Use exact matching with the actual CSV values
+            switch (filter) {
+                case 'varsity':
+                    result = schoolValue === 'IIE Varsity College';
+                    break;
+                case 'rosebank':
+                    result = schoolValue === 'IIE Rosebank College';
+                    break;
+                case 'vega':
+                    result = schoolValue === 'IIE Vega School';
+                    break;
+                case 'msa':
+                    result = schoolValue === 'IIE MSA';
+                    break;
+                case 'hospitality':
+                    result = schoolValue === 'IIE School of Hospitality & Service Management';
+                    break;
+                case 'central':
+                    result = schoolValue === 'Central Academic Team';
+                    break;
+                default:
+                    result = true;
+                    break;
+            }
+            console.log(`Match result: ${result}`);
+            return result;
         }
 
         // Analyze question data
@@ -1219,16 +1328,58 @@
             }
         }
 
+        function onSchoolChange(schoolValue) {
+            currentSchoolFilter = schoolValue;
+            
+            console.log('School filter changed to:', schoolValue);
+            
+            // Update active school button
+            document.querySelectorAll('.school-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-school="${schoolValue}"]`).classList.add('active');
+            
+            updateFilterBadge();
+            updateFilteredCount();
+            
+            // ALWAYS trigger analysis if we have a question - this should refresh the chart and table
+            if (currentQuestion) {
+                console.log('Re-analyzing with new school filter for question:', currentQuestion);
+                analyzeAndDisplay();
+            } else {
+                console.log('No question selected, but school filter changed');
+            }
+        }
+
         // Update filter badge
         function updateFilterBadge() {
             const badge = document.getElementById('filterBadge');
             
-            if (currentFilter === 'all') {
+            let filters = [];
+            
+            // Add staff type filter
+            if (currentFilter === 'academic') {
+                filters.push('Academic Staff');
+            } else if (currentFilter === 'non-teaching') {
+                filters.push('Non-teaching Staff');
+            }
+            
+            // Add school filter
+            if (currentSchoolFilter !== 'all') {
+                const schoolNames = {
+                    'varsity': 'Varsity College',
+                    'rosebank': 'Rosebank College', 
+                    'vega': 'Vega School',
+                    'msa': 'MSA',
+                    'hospitality': 'Hospitality & Service',
+                    'central': 'Central Academic'
+                };
+                filters.push(schoolNames[currentSchoolFilter]);
+            }
+            
+            if (filters.length === 0) {
                 badge.style.display = 'none';
             } else {
                 badge.style.display = 'inline-block';
-                badge.textContent = currentFilter === 'academic' ? 
-                    'Academic Staff Only' : 'Non-teaching Staff Only';
+                badge.textContent = filters.join(' • ') + ' Only';
             }
         }
 
@@ -1287,6 +1438,15 @@
                 console.log('Tab button clicked:', button.dataset.filter);
                 e.preventDefault();
                 onTabChange(button.dataset.filter);
+            });
+        });
+
+        // School button listeners
+        document.querySelectorAll('.school-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                console.log('School button clicked:', button.dataset.school);
+                e.preventDefault();
+                onSchoolChange(button.dataset.school);
             });
         });
 
