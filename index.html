@@ -10,20 +10,27 @@
     
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Chart.js Data Labels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <style>
         :root {
-            --saheti-navy: #1a365d;
-            --saheti-blue: #2b4c77;
-            --saheti-light-blue: #4a6fa5;
-            --saheti-gold: #b5a36a;
-            --saheti-light-gold: #d4c090;
-            --saheti-cream: #f7f5f0;
-            --saheti-charcoal: #2d3748;
-            --saheti-light-gray: #edf2f7;
+            --iie-black: #000000;
+            --iie-red: #c8102e;
+            --iie-light-red: #e63946;
+            --iie-blue: #4a90a4;
+            --iie-light-blue: #a8dadc;
+            --iie-pale-blue: #e6f3f5;
+            --iie-gold: #b8860b;
+            --iie-light-gold: #daa520;
+            --iie-green: #8fbc8f;
+            --iie-white: #ffffff;
+            --iie-gray: #6c757d;
+            --iie-light-gray: #e9ecef;
+            --iie-dark-gray: #495057;
         }
 
         .chart-container {
@@ -32,9 +39,9 @@
             width: 100%;
         }
         .nav-button.active {
-            border-bottom: 2px solid #3B82F6;
-            color: #2563EB;
-            background-color: #EFF6FF;
+            border-bottom: 2px solid var(--iie-red);
+            color: var(--iie-red);
+            background-color: rgba(200, 16, 46, 0.1);
         }
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
@@ -45,37 +52,40 @@
         }
 
         .saheti-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--iie-pale-blue);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(181, 163, 106, 0.2);
+            border: 2px solid var(--iie-red);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .saheti-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(26, 54, 93, 0.1), 0 10px 10px -5px rgba(26, 54, 93, 0.04);
-            border-color: var(--saheti-gold);
+            box-shadow: 0 20px 25px -5px rgba(200, 16, 46, 0.2), 0 10px 10px -5px rgba(200, 16, 46, 0.1);
+            border-color: var(--iie-light-red);
+            background: var(--iie-white);
         }
 
         .saheti-gradient-text {
-            background: linear-gradient(135deg, var(--saheti-navy), var(--saheti-gold));
+            background: linear-gradient(135deg, var(--iie-black), var(--iie-red));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .details-btn {
-            background: linear-gradient(135deg, var(--saheti-gold), var(--saheti-light-gold));
-            color: var(--saheti-navy);
+            background: linear-gradient(135deg, var(--iie-blue), var(--iie-light-blue));
+            color: var(--iie-white);
             font-weight: 600;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(181, 163, 106, 0.3);
+            box-shadow: 0 4px 12px rgba(74, 144, 164, 0.3);
+            border: 1px solid var(--iie-red);
         }
 
         .details-btn:hover {
             transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 8px 20px rgba(181, 163, 106, 0.4);
-            background: linear-gradient(135deg, var(--saheti-light-gold), #e6d7a8);
+            box-shadow: 0 8px 20px rgba(74, 144, 164, 0.4);
+            background: linear-gradient(135deg, var(--iie-light-blue), var(--iie-blue));
+            border-color: var(--iie-light-red);
         }
 
         .header-animation {
@@ -109,9 +119,9 @@
         }
     </style>
 </head>
-<body class="min-h-screen" style="background: linear-gradient(135deg, var(--saheti-cream) 0%, var(--saheti-light-gray) 100%);">
+<body class="min-h-screen" style="background: linear-gradient(135deg, var(--iie-light-gray) 0%, var(--iie-gray) 20%, var(--iie-light-gray) 100%);">
     <!-- Header -->
-    <header class="saheti-card shadow-lg border-b border-saheti-gold header-animation">
+    <header class="bg-white shadow-lg border-b border-red-500 header-animation">
         <div class="max-w-7xl mx-auto px-4 py-6">
             <div class="flex justify-between items-center">
                 <div>
@@ -140,31 +150,31 @@
     <div class="bg-white shadow-sm border-b">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex overflow-x-auto">
-                <button class="nav-button active flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="overview">
+                <button class="nav-button active flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-red-600 hover:border-red-300" data-section="overview">
                     <i data-lucide="trending-up" class="mr-2 w-4 h-4"></i>
                     Executive Overview
                 </button>
-                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="adoption">
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-red-600 hover:border-red-300" data-section="adoption">
                     <i data-lucide="users" class="mr-2 w-4 h-4"></i>
                     Overall Adoption
                 </button>
-                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="academic">
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-red-600 hover:border-red-300" data-section="academic">
                     <i data-lucide="book-open" class="mr-2 w-4 h-4"></i>
                     Academic Staff
                 </button>
-                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="students">
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-red-600 hover:border-red-300" data-section="students">
                     <i data-lucide="alert-triangle" class="mr-2 w-4 h-4"></i>
                     Student Concerns
                 </button>
-                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="admin">
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-red-600 hover:border-red-300" data-section="admin">
                     <i data-lucide="briefcase" class="mr-2 w-4 h-4"></i>
                     Administrative Staff
                 </button>
-                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="assistance">
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-red-600 hover:border-red-300" data-section="assistance">
                     <i data-lucide="settings" class="mr-2 w-4 h-4"></i>
                     Required Staff Assistance
                 </button>
-                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-section="recommendations">
+                <button class="nav-button flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors border-transparent text-gray-500 hover:text-red-600 hover:border-red-300" data-section="recommendations">
                     <i data-lucide="shield" class="mr-2 w-4 h-4"></i>
                     Strategic Recommendations
                 </button>
@@ -334,40 +344,40 @@
                 <div class="bg-white p-6 rounded-lg shadow-sm border">
                     <h4 class="text-lg font-semibold mb-4">Tool Dominance</h4>
                     <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-700">ChatGPT</span>
-                            <div class="flex items-center">
-                                <div class="w-24 bg-gray-200 rounded-full h-3 mr-3">
-                                    <div class="h-3 rounded-full bg-blue-500 transition-all duration-500" style="width: 89.1%"></div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-gray-700 w-32 flex-shrink-0">ChatGPT</span>
+                            <div class="flex-1 flex items-center">
+                                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                    <div class="h-3 rounded-full bg-red-500 transition-all duration-500" style="width: 89.1%"></div>
                                 </div>
-                                <span class="font-bold text-blue-600">89.1%</span>
+                                <span class="font-bold text-red-600 ml-3 w-12 flex-shrink-0">89.1%</span>
                             </div>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-700">Meta AI</span>
-                            <div class="flex items-center">
-                                <div class="w-24 bg-gray-200 rounded-full h-3 mr-3">
-                                    <div class="h-3 rounded-full bg-blue-500 transition-all duration-500" style="width: 49.8%"></div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-gray-700 w-32 flex-shrink-0">Meta AI</span>
+                            <div class="flex-1 flex items-center">
+                                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                    <div class="h-3 rounded-full bg-red-500 transition-all duration-500" style="width: 49.8%"></div>
                                 </div>
-                                <span class="font-bold text-blue-600">49.8%</span>
+                                <span class="font-bold text-red-600 ml-3 w-12 flex-shrink-0">49.8%</span>
                             </div>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-700">Microsoft Copilot</span>
-                            <div class="flex items-center">
-                                <div class="w-24 bg-gray-200 rounded-full h-3 mr-3">
-                                    <div class="h-3 rounded-full bg-blue-500 transition-all duration-500" style="width: 47.1%"></div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-gray-700 w-32 flex-shrink-0">Microsoft Copilot</span>
+                            <div class="flex-1 flex items-center">
+                                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                    <div class="h-3 rounded-full bg-red-500 transition-all duration-500" style="width: 47.1%"></div>
                                 </div>
-                                <span class="font-bold text-blue-600">47.1%</span>
+                                <span class="font-bold text-red-600 ml-3 w-12 flex-shrink-0">47.1%</span>
                             </div>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-700">Other Tools</span>
-                            <div class="flex items-center">
-                                <div class="w-24 bg-gray-200 rounded-full h-3 mr-3">
-                                    <div class="h-3 rounded-full bg-blue-500 transition-all duration-500" style="width: 25%"></div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-gray-700 w-32 flex-shrink-0">Other Tools</span>
+                            <div class="flex-1 flex items-center">
+                                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                    <div class="h-3 rounded-full bg-red-500 transition-all duration-500" style="width: 25%"></div>
                                 </div>
-                                <span class="font-bold text-blue-600">25.0%</span>
+                                <span class="font-bold text-red-600 ml-3 w-12 flex-shrink-0">25.0%</span>
                             </div>
                         </div>
                     </div>
@@ -755,7 +765,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-gray-800 text-white">
+    <div class="text-white" style="background-color: var(--iie-black);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="text-center">
                 <p class="text-sm text-gray-300">
@@ -767,6 +777,12 @@
     </div>
 
     <script>
+        // Register Chart.js Data Labels plugin
+        Chart.register(ChartDataLabels);
+        
+        // Set global default to disable data labels
+        Chart.defaults.plugins.datalabels.display = false;
+
         // Initialize Lucide icons
         lucide.createIcons();
 
@@ -838,7 +854,7 @@
                     labels: ['Personal Use', 'Work Use', 'No Use'],
                     datasets: [{
                         data: [86.7, 77.0, 13.3],
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B'],
+                        backgroundColor: ['#c8102e', '#4a90a4', '#b8860b'],
                         borderWidth: 2,
                         borderColor: '#ffffff'
                     }]
@@ -852,6 +868,17 @@
                             labels: {
                                 padding: 20,
                                 usePointStyle: true
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#ffffff',
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            },
+                            formatter: function(value) {
+                                return value + '%';
                             }
                         },
                         tooltip: {
@@ -879,8 +906,8 @@
                     datasets: [{
                         label: 'Usage Rate (%)',
                         data: [89.1, 49.8, 47.1, 25.0],
-                        backgroundColor: '#3B82F6',
-                        borderColor: '#1E40AF',
+                        backgroundColor: '#c8102e',
+                        borderColor: '#000000',
                         borderWidth: 1
                     }]
                 },
@@ -890,6 +917,19 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        datalabels: {
+                            display: true,
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#000000',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function(value) {
+                                return value + '%';
+                            }
                         }
                     },
                     scales: {
@@ -924,15 +964,15 @@
                     datasets: [{
                         label: 'Support (%)',
                         data: [85.8, 85.8, 64.7],
-                        backgroundColor: '#10B981'
+                        backgroundColor: '#8fbc8f'
                     }, {
                         label: 'Usage (%)',
                         data: [60.8, 54.4, 27.9],
-                        backgroundColor: '#3B82F6'
+                        backgroundColor: '#4a90a4'
                     }, {
                         label: 'Gap (%)',
                         data: [25.0, 31.4, 36.8],
-                        backgroundColor: '#EF4444'
+                        backgroundColor: '#c8102e'
                     }]
                 },
                 options: {
@@ -956,6 +996,19 @@
                     plugins: {
                         legend: {
                             position: 'top'
+                        },
+                        datalabels: {
+                            display: true,
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#000000',
+                            font: {
+                                weight: 'bold',
+                                size: 11
+                            },
+                            formatter: function(value) {
+                                return value + '%';
+                            }
                         }
                     }
                 }
@@ -975,8 +1028,8 @@
                     datasets: [{
                         label: 'Concern Level (%)',
                         data: [91.2, 90.2, 88.7],
-                        backgroundColor: '#DC2626',
-                        borderColor: '#991B1B',
+                        backgroundColor: '#c8102e',
+                        borderColor: '#000000',
                         borderWidth: 1
                     }]
                 },
@@ -986,6 +1039,19 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        datalabels: {
+                            display: true,
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#000000',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function(value) {
+                                return value + '%';
+                            }
                         }
                     },
                     scales: {
@@ -1020,8 +1086,8 @@
                     datasets: [{
                         label: 'Usage (%)',
                         data: [55.1, 52.8, 29.9, 15.0],
-                        backgroundColor: '#3B82F6',
-                        borderColor: '#1E40AF',
+                        backgroundColor: '#4a90a4',
+                        borderColor: '#000000',
                         borderWidth: 1
                     }]
                 },
@@ -1031,6 +1097,19 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        datalabels: {
+                            display: true,
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#000000',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function(value) {
+                                return value + '%';
+                            }
                         }
                     },
                     scales: {
@@ -1073,8 +1152,8 @@
                     datasets: [{
                         label: 'Staff Support (%)',
                         data: [81.6, 76.4, 75.8, 70.1, 55.9, 55.3, 9.7],
-                        backgroundColor: '#3B82F6',
-                        borderColor: '#1E40AF',
+                        backgroundColor: '#4a90a4',
+                        borderColor: '#000000',
                         borderWidth: 1
                     }]
                 },
@@ -1084,6 +1163,19 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        datalabels: {
+                            display: true,
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#000000',
+                            font: {
+                                weight: 'bold',
+                                size: 11
+                            },
+                            formatter: function(value) {
+                                return value + '%';
+                            }
                         }
                     },
                     scales: {

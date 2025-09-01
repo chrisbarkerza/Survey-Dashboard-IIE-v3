@@ -14,14 +14,14 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         :root {
-            --saheti-navy: #1a365d;
-            --saheti-blue: #2b4c77;
-            --saheti-light-blue: #4a6fa5;
-            --saheti-gold: #b5a36a;
-            --saheti-light-gold: #d4c090;
-            --saheti-cream: #f7f5f0;
-            --saheti-charcoal: #2d3748;
-            --saheti-light-gray: #edf2f7;
+            --saheti-navy: #000000;
+            --saheti-blue: #4a90a4;
+            --saheti-light-blue: #a8dadc;
+            --saheti-gold: #c8102e;
+            --saheti-light-gold: #e63946;
+            --saheti-cream: #e6f3f5;
+            --saheti-charcoal: #495057;
+            --saheti-light-gray: #e9ecef;
         }
 
         * {
@@ -31,22 +31,23 @@
         }
 
         body {
-            background: linear-gradient(135deg, var(--saheti-cream) 0%, var(--saheti-light-gray) 100%);
+            background: linear-gradient(135deg, var(--saheti-light-gray) 0%, var(--saheti-charcoal) 20%, var(--saheti-light-gray) 100%);
             min-height: 100vh;
             color: #333;
         }
 
         .saheti-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--saheti-cream);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(181, 163, 106, 0.2);
+            border: 2px solid var(--saheti-gold);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .saheti-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(26, 54, 93, 0.1), 0 10px 10px -5px rgba(26, 54, 93, 0.04);
-            border-color: var(--saheti-gold);
+            box-shadow: 0 20px 25px -5px rgba(200, 16, 46, 0.2), 0 10px 10px -5px rgba(200, 16, 46, 0.1);
+            border-color: var(--saheti-light-gold);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .saheti-gradient-text {
@@ -57,17 +58,19 @@
         }
 
         .details-btn {
-            background: linear-gradient(135deg, var(--saheti-gold), var(--saheti-light-gold));
-            color: var(--saheti-navy);
+            background: linear-gradient(135deg, var(--saheti-blue), var(--saheti-light-blue));
+            color: white;
             font-weight: 600;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(181, 163, 106, 0.3);
+            box-shadow: 0 4px 12px rgba(74, 144, 164, 0.3);
+            border: 1px solid var(--saheti-gold);
         }
 
         .details-btn:hover {
             transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 8px 20px rgba(181, 163, 106, 0.4);
-            background: linear-gradient(135deg, var(--saheti-light-gold), #e6d7a8);
+            box-shadow: 0 8px 20px rgba(74, 144, 164, 0.4);
+            background: linear-gradient(135deg, var(--saheti-light-blue), var(--saheti-blue));
+            border-color: var(--saheti-light-gold);
         }
 
         .nav-arrow {
@@ -202,7 +205,7 @@
 
         .question-title {
             font-size: 1.3em;
-            color: #1e3a5f;
+            color: #000000;
             font-weight: 600;
             margin-bottom: 10px;
             line-height: 1.4;
@@ -264,7 +267,7 @@
         .data-table th {
             background: #f8f9fa;
             font-weight: 600;
-            color: #1e3a5f;
+            color: #000000;
             position: sticky;
             top: 0;
         }
@@ -275,7 +278,7 @@
 
         .filter-badge {
             display: inline-block;
-            background: linear-gradient(135deg, #1e3a5f, #3182ce);
+            background: linear-gradient(135deg, #000000, #4a90a4);
             color: white;
             padding: 5px 12px;
             border-radius: 15px;
@@ -301,7 +304,7 @@
             padding: 15px;
             margin-bottom: 10px;
             border-radius: 8px;
-            border-left: 4px solid #3182ce;
+            border-left: 4px solid #4a90a4;
         }
 
         .loading {
@@ -332,7 +335,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="saheti-card shadow-lg border-b border-saheti-gold header-animation">
+    <header class="bg-white shadow-lg border-b border-red-500 header-animation">
         <div class="max-w-7xl mx-auto px-4 py-6">
             <div class="flex justify-between items-center">
                 <div>
@@ -436,29 +439,29 @@
             const colors = [];
             switch (count) {
                 case 1:
-                    colors.push('#1a365d'); // Theme dark blue
+                    colors.push('#000000'); // Theme black
                     break;
                 case 2:
-                    colors.push('#1a365d'); // Theme dark blue
-                    colors.push('#b5a36a'); // Theme gold
+                    colors.push('#000000'); // Theme black
+                    colors.push('#c8102e'); // Theme red
                     break;
                 case 3:
-                    colors.push('#1a365d'); // Theme dark blue
-                    colors.push(createGradient(ctx, '#2b4c77', '#b5a36a')); // Half blue half gold
-                    colors.push('#b5a36a'); // Theme gold
+                    colors.push('#000000'); // Theme black
+                    colors.push(createGradient(ctx, '#4a90a4', '#c8102e')); // Half blue half red
+                    colors.push('#c8102e'); // Theme red
                     break;
                 case 4:
-                    colors.push('#1a365d'); // Theme dark blue
-                    colors.push(createGradient(ctx, '#2b4c77', '#b5a36a')); // Half blue half gold
-                    colors.push('#b5a36a'); // Theme gold
-                    colors.push(createGradient(ctx, '#b5a36a', '#dc3545')); // Half gold half red
+                    colors.push('#000000'); // Theme black
+                    colors.push(createGradient(ctx, '#4a90a4', '#c8102e')); // Half blue half red
+                    colors.push('#c8102e'); // Theme red
+                    colors.push(createGradient(ctx, '#c8102e', '#4a90a4')); // Half red half blue
                     break;
                 case 5:
                 default:
-                    colors.push('#1a365d'); // Theme dark blue
-                    colors.push(createGradient(ctx, '#2b4c77', '#b5a36a')); // Half blue half gold
-                    colors.push('#b5a36a'); // Theme gold
-                    colors.push(createGradient(ctx, '#b5a36a', '#dc3545')); // Half gold half red
+                    colors.push('#000000'); // Theme black
+                    colors.push(createGradient(ctx, '#4a90a4', '#c8102e')); // Half blue half red
+                    colors.push('#c8102e'); // Theme red
+                    colors.push(createGradient(ctx, '#c8102e', '#4a90a4')); // Half red half blue
                     colors.push('rgba(220, 53, 69, 0.5)'); // Theme 50% red
                     break;
             }
