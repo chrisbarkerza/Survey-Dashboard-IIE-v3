@@ -390,7 +390,7 @@ const CompleteDashboard = () => {
             <h4 className="font-semibold text-purple-800 mb-3">Experience & Skills</h4>
             <ul className="text-sm text-purple-700 space-y-1">
               <li>• 18 years median total experience</li>
-              <li>• 8 years median at SAHETI</li>
+              <li>• 8 years median at IIE</li>
               <li>• 64% moderate IT skills</li>
               <li>• 35% advanced IT skills</li>
             </ul>
@@ -416,7 +416,7 @@ const CompleteDashboard = () => {
           </div>
           <div className="bg-purple-50 p-4 rounded-lg text-center">
             <div className="text-xl font-bold text-purple-600">6</div>
-            <div className="text-sm text-gray-600">Years Median at SAHETI</div>
+            <div className="text-sm text-gray-600">Years Median at IIE</div>
           </div>
           <div className="bg-yellow-50 p-4 rounded-lg text-center">
             <div className="text-xl font-bold text-yellow-600">40%</div>
